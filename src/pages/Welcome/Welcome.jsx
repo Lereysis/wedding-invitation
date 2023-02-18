@@ -1,6 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import login from '../../services/LoginAuth/Login'
+import { useNavigate } from 'react-router-dom'
 const Welcome = () => {
+  const navigate = useNavigate()
+  useEffect(() => {
+    let authToken = sessionStorage.getItem('Auth Token')
+    if (authToken) {
+      navigate('/administracion-invitados')
+    }
+  }, [])
   return (
     <div className='container'>
         <h1>
@@ -13,8 +22,8 @@ const Welcome = () => {
             Elige una opcion dependiendo de tu caso
         </p>
         <div>
-            <Link to="/iniciar-sesion" className='btn btn-primary'>Iniciar Sesion</Link>
-            <Link to="/registro" className='btn btn-outline-secondary'>Registrarse</Link>
+            <button onClick={login} className='btn btn-primary'>Iniciar Con google</button>
+            <button  className='btn btn-outline-secondary'>Registrarse</button>
         </div>
     </div>
   )
