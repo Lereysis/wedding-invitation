@@ -1,4 +1,5 @@
 import React from 'react'
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from "react-router-dom";
 import { store } from '@/redux/store'

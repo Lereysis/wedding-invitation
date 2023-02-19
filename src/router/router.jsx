@@ -3,7 +3,6 @@ import Wedding from "../pages/Wedding/Wedding";
 import Welcome from "../pages/Welcome/Welcome";
 import App from "../app/app";
 import Guests from "../pages/Guests/Guests";
-import QR from "../pages/QR/QR"
 
 const router = createBrowserRouter([
     {
@@ -22,10 +21,6 @@ const router = createBrowserRouter([
           path: "/administracion-invitados",
           element: <Guests/>,
         },
-        {
-          path:"/administracion-invitados-qr",
-          element:<QR/>
-        }
       ]
     },
 ]);

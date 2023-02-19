@@ -1,19 +1,20 @@
 import React,{useState} from 'react'
 import api from '@/services/api/api'
-import { useSelector } from 'react-redux'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { updatedState } from '@/redux/Slices/guestSlice'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const FormGuest = () => {
+    const MySwal = withReactContent(Swal)
 
     const [state,setState] = useState({
         name:'',
         numberPhone: '',
         numberGuest:''
     })
-
+    const dispatch = useDispatch()
     const user = useSelector(state=> state.users.user)
-    
-
     const handleChange = (e) => {
         setState({
             ...state,
@@ -26,14 +27,20 @@ const FormGuest = () => {
         e.preventDefault()
 
         if(!state.name.length || !state.numberPhone.length || !state.numberGuest.length ){
-            return alert("son obligatorios los campos")
+
+            MySwal.fire({
+                icon: 'error',
+                title: 'Ups...',
+                text: 'Todos los campos son obligatorios!',
+            })
+            return
         }
 
         await api.post('/guest',{
-            email: JSON.parse(localStorage.getItem('user')).email,
+            email: user.email,
             ...state
         })
-
+        dispatch(updatedState('loadingStateAddGuest'))
         setState({
             name:'',
             numberPhone: '',
