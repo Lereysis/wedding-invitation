@@ -1,22 +1,19 @@
-import { getRedirectResult, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { auth } from "../configAuth/authFirebase";
-import axios from "axios";
-const login = () => {
+const login = async () => {
     const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
-    getRedirectResult(auth)
-        .then((result) => {
-            console.log(result)
-            localStorage.setItem('User', JSON.stringify(result.user))
-            axios.post('http://localhost:4000/user',{
-                name:result.user.displayName,
-                email:result.user.email,
-                numberPhone:''
-            })
-            sessionStorage.setItem('Auth Token', result._tokenResponse.refreshToken)
-        }).catch((error) => {
-            console.log(error)
-        });
+    signInWithPopup(auth, provider)
+    .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        localStorage.setItem('Auth Token',token)
+        const user = result.user;
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+    });
 }
 
 export default login
