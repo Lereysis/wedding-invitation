@@ -1,13 +1,29 @@
-import React from 'react'
+import React,{useEffect,useState} from 'react'
 import { useParams } from 'react-router-dom';
 import db from '../../db/db';
 import './Wedding.scss'
 import bannerBackground1 from '../../assets/img/banner-background1.png'
 import imageCouple from '../../assets/img/image-couple.png'
+import api from '@/services/api/api'
 
 const Wedding = () => {
     const { slug } = useParams()
-    const {nameGuest,numberGuest} = db.find( guest => guest.slugGuest === slug)
+    // const {nameGuest,numberGuest} = db.find( guest => guest.slugGuest === slug)
+
+    const [guest,setGuest] = useState({})
+
+    useEffect( () => {
+        ( async () => {
+          const response = await api.get(`/guest-invitation/${slug}`)
+          setGuest(response.data.body)
+        })()
+    },[])
+
+    const confirmation = async (numberPhone) => {
+        const response = await api.post(`/confirmed`,{numberPhone})
+    }
+
+
     return (
         <div className='container-wedding text-center'>
             <img className='img-fluid'  src={bannerBackground1} />
@@ -22,11 +38,15 @@ const Wedding = () => {
                 </div>
             </div>
             <h1>
-                {nameGuest}
+                {guest.name}
             </h1>
             <p>
-                Numero de invitados: {numberGuest}
+                Numero de invitados: {guest.numberGuest}
             </p>
+
+            {
+                guest.isConfirmed ? (<p>Asistencia confirmada</p>) : (<button onClick={() => confirmation(guest.numberPhone)} className='btn btn-primary'>Confirmar asistencia</button>)
+            }
         </div>
     )
 }

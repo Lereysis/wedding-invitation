@@ -1,6 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import {useDispatch, useSelector} from 'react-redux'
+import { fetchGuests } from '@/redux/Slices/usersSlice'
 
 const TableGuest = () => {
+
+    const guests = useSelector(state => state.users.guests)
+    console.log(guests)
+
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+        dispatch(fetchGuests(JSON.parse(localStorage.getItem('user')).email))
+    },[dispatch])
+
     return (
         <div className="table-responsive">
             <table className="table">
@@ -8,28 +20,28 @@ const TableGuest = () => {
                     <tr>
                         <th scope="col">Nombre de invitado</th>
                         <th scope="col">Nro de acompañantes</th>
+                        <th scope="col">Confirmación</th>
+                        <th scope="col">Slug</th>
                         <th scope="col">Nro de Whatsapp</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td colspan="2">Larry the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    {
+                        guests.map(e => {
+                            return (
+                                <tr>
+                                    <td>{e.name}</td>
+                                    <td>{e.numberGuest}</td>
+                                    <td>{e.isConfirmed ? 'confirmada la asistencia' : 'Por confirmar asistencia'}</td>
+                                    <td><a href={e.slug} target="_blank" rel="noopener noreferrer">{e.slug}</a></td>
+                                    <td>{e.numberPhone}</td>
+                                    <td>send Whatsapp</td>
+                                </tr>
+                            )
+                        })
+                    }
+        
                 </tbody>
             </table>
         </div>
