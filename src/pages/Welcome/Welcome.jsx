@@ -21,6 +21,10 @@ const Welcome = () => {
         const uid = user.uid;
         setUserLocal(user)
         setAuthToken(localStorage.getItem('Auth Token'))
+        localStorage.setItem('user', JSON.stringify({
+            name: user.displayName,
+            email:user.email
+        }))
         if (authToken) {
           (async()=>{
             await api.post('/user',{
@@ -29,7 +33,6 @@ const Welcome = () => {
               numberPhone: ""
             })
           })()
-          dispatch(setUser(userLocal))
           navigate('/administracion-invitados')
         }
       } else {

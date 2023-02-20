@@ -8,22 +8,16 @@ import api from '@/services/api/api'
 
 const Wedding = () => {
     const { slug } = useParams()
-    // const {nameGuest,numberGuest} = db.find( guest => guest.slugGuest === slug)
-
     const [guest,setGuest] = useState({})
-
     useEffect( () => {
         ( async () => {
           const response = await api.get(`/guest-invitation/${slug}`)
           setGuest(response.data.body)
         })()
     },[])
-
     const confirmation = async (numberPhone) => {
         const response = await api.post(`/confirmed`,{numberPhone})
     }
-
-
     return (
         <div className='container-wedding text-center'>
             <img className='img-fluid'  src={bannerBackground1} />
