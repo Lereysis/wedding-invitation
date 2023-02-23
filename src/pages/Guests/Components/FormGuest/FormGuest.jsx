@@ -5,13 +5,22 @@ import { updatedState } from '@/redux/Slices/guestSlice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
+
+const messageDefault = `¡Querida familia [name]! 🤗 
+Nos complace invitarlos a la celebración de nuestro amor en el día más especial de nuestras vidas. Por favor únanse a nosotros en nuestra boda para compartir la alegría, el amor y la felicidad en este día tan importante.
+
+🎉 ¡Esperamos verlos pronto y compartir juntos este día inolvidable! 🎉
+
+Pueden encontrar todos los detalles de la invitación en el siguiente enlace:`
+
 const FormGuest = () => {
     const MySwal = withReactContent(Swal)
 
     const [state,setState] = useState({
         name:'',
         numberPhone: '',
-        numberGuest:''
+        numberGuest:'',
+        messageCustomize:messageDefault
     })
     const dispatch = useDispatch()
     const user = useSelector(state=> state.users.user)
@@ -19,14 +28,13 @@ const FormGuest = () => {
         setState({
             ...state,
             [e.target.name]:e.target.value,
-
         })
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if(!state.name.length || !state.numberPhone.length || !state.numberGuest.length ){
+        if(!state.name.length || !state.numberPhone.length || !state.numberGuest.length || !state.messageCustomize.length ){
 
             MySwal.fire({
                 icon: 'error',
@@ -35,7 +43,10 @@ const FormGuest = () => {
             })
             return
         }
-
+        setState({
+            ...state,
+            messageCustomize: state.messageCustomize.replace('[name]', state.name)
+        })
         await api.post('/guest',{
             email: user.email,
             ...state
@@ -44,7 +55,8 @@ const FormGuest = () => {
         setState({
             name:'',
             numberPhone: '',
-            numberGuest:''
+            numberGuest:'',
+            messageCustomize:messageDefault
         })
     }
 
@@ -61,6 +73,10 @@ const FormGuest = () => {
             <div className="col-lg-4 mb-3">
                 <label htmlFor="password" className="form-label">Numero de telefono</label>
                 <input onChange={handleChange} name='numberPhone' value={state.numberPhone} type="tel" className="form-control"  />
+            </div>
+            <div className="col-lg-12 mb-3">
+                <label htmlFor="message" className="form-label">Mensaje perzonalizado para el invitado</label>
+                <textarea onChange={handleChange} className='form-control' id="message" name="messageCustomize" value={state.messageCustomize}  rows="8"></textarea>
             </div>
             <button type="submit" className="btn btn-primary">Agregar</button>
         </form>
