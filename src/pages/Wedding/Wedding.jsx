@@ -1,6 +1,5 @@
 import React,{useEffect,useState} from 'react'
 import { useParams } from 'react-router-dom';
-import db from '../../db/db';
 import './Wedding.scss'
 import bannerBackground1 from '../../assets/img/banner-background1.png'
 import imageCouple from '../../assets/img/image-couple.png'

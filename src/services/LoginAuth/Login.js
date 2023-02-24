@@ -4,9 +4,14 @@ const login = async () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
     .then((result) => {
+        console.log(result)
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         localStorage.setItem('Auth Token',token)
+        localStorage.setItem('user', JSON.stringify({
+            name: result.user.displayName,
+            email:result.user.email
+        }))
         const user = result.user;
     }).catch((error) => {
         const errorCode = error.code;
