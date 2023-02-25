@@ -1,7 +1,7 @@
 import React,{useState} from 'react'
 import api from '@/services/api/api'
 import { useSelector, useDispatch } from 'react-redux'
-import { updatedState } from '@/redux/Slices/guestSlice'
+import { updatedState,resetStateLoading } from '@/redux/Slices/guestSlice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import useUser from '@/hooks/useUser'
@@ -60,7 +60,7 @@ const FormGuest = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
+        dispatch(resetStateLoading('loadingStateAddGuest'))
         if(errors.name || errors.numberPhone || errors.numberGuest){
 
             MySwal.fire({
@@ -85,9 +85,12 @@ const FormGuest = () => {
             ...state,
             messageCustomize: state.messageCustomize.replace('[name]', state.name)
         })
+        console.log(state)
         await api.post('/guest',{
             email: user.email,
-            ...state
+            ...state,
+            messageCustomize: state.messageCustomize.replace('[name]', state.name)
+
         })
         dispatch(updatedState('loadingStateAddGuest'))
         MySwal.fire({
@@ -111,18 +114,18 @@ const FormGuest = () => {
             <h4>Agrega tu invitado</h4>
             <form onSubmit={handleSubmit} className='row'>
                 <div className="col-lg-12 mb-3">
-                    <label htmlFor="emailOrUser" className="form-label">Nombre de el invitado</label>
+                    <label htmlFor="emailOrUser" className="form-label">Nombre del invitado</label>
                     <input onChange={e => handleChange(e)} name='name' value={state.name} type="text" className="form-control" aria-describedby="emailHelp" />
                     {errors.name && (<p className='text-danger'>{errors.name}</p>)}
                 </div>
                 <div className="col-lg-12 mb-3">
-                    <label htmlFor="password" className="form-label">Numero de invitados</label>
-                    <small className='d-block'>(Recuerda escribir el codigo de el pais sin el +) </small>
+                    <label htmlFor="password" className="form-label">Número de invitados</label>
                     <input onChange={handleChange} name='numberGuest' value={state.numberGuest} type="number" className="form-control"/>
                     {errors.numberGuest && (<p className='text-danger' >{errors.numberGuest}</p>)}
                 </div>
                 <div className="col-lg-12 mb-3">
-                    <label htmlFor="password" className="form-label">Numero de telefono</label>
+                    <label htmlFor="password" className="form-label">Número de teléfono</label>
+                    <small className='d-block'>(Recuerda escribir el codigo de el pais sin el +) </small>
                     <input onChange={handleChange} name='numberPhone' value={state.numberPhone} type="tel" className="form-control"  />
                     {errors.numberPhone && (<p className='text-danger' >{errors.numberPhone}</p>)}
                 </div>

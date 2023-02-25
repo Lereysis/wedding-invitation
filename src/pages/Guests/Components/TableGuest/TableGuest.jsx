@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchGuests } from '@/redux/Slices/guestSlice'
+import { fetchGuests, setSelectedGuest, updatedState, resetStateLoading} from '@/redux/Slices/guestSlice'
 import api from '@/services/api/api'
 import useUser from '@/hooks/useUser'
 import Swal from 'sweetalert2'
@@ -14,33 +14,54 @@ const TableGuest = () => {
     const guests = useSelector(state => state.guests.guests)
     const loadingGuest = useSelector(state => state.guests.loadingStateListGuests)
     const loadingAddGuest = useSelector(state => state.guests.loadingStateAddGuest)
+    const loadingStateDeleteGuest = useSelector(state => state.guests.loadingStateDeleteGuest)
+    const loadingStateChangeState = useSelector(state => state.guests.loadingStateChangeState)
+
     const { user } = useUser()
-    const [guestSelected, setGuestSelected] = useState(null)
+
     const dispatch = useDispatch()
+
+
+
     useEffect(() => {
         dispatch(fetchGuests(user.email))
+        
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    }, [dispatch, user, loadingGuest, loadingAddGuest])
+    }, [dispatch, user, loadingGuest, loadingAddGuest,loadingStateDeleteGuest,loadingStateChangeState])
 
-    const sendWhatsapp = async (message, number) => {
+    const sendWhatsapp = async (url, number, message) => {
         await api.post('/send-message', {
             number,
-            message: `${window.location.origin}/${message}`
+            url:`${window.location.origin}/${url}`,
+            message
+        })
+    }
+
+    const handleClickGuest = (guest) => {
+        const myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
+        const myModalEl = document.getElementById('exampleModal')
+        myModal.show(myModalEl)
+        myModalEl.addEventListener('shown.bs.modal', () => {
+            dispatch(setSelectedGuest(guest))
         })
     }
 
     
-    const handleDelete = () => {
+    
+    const handleDelete = async (numberPhone) => {
         MySwal.fire({
             title: '¿Seguro de querer borrar el invitado?',
             showDenyButton: true,
             showCancelButton: false,
             confirmButtonText: 'Borrar',
             denyButtonText: `Cancelar`,
-          }).then((result) => {
+          }).then(async (result) => {
+            dispatch(resetStateLoading('loadingStateDeleteGuest'))
             if (result.isConfirmed) {
-              
+                console.log(numberPhone)
+              await api.delete('/guest',{ data: {numberPhone}})
+              dispatch(updatedState('loadingStateDeleteGuest'))
             } else if (result.isDenied) {
               
             }
@@ -80,7 +101,11 @@ const TableGuest = () => {
                 </thead>
                 <tbody>
                     {
-                        guests.map(e => {
+                        !loadingGuest 
+                        ? (<h1>Cargando</h1>) 
+                        : loadingGuest && !guests.length 
+                        ? (<h1>No hay datos</h1>)
+                        : guests.map(e => {
                             return (
                                 <tr key={e.numberPhone} className='table-light'>
                                     <td>{e.name}</td>
@@ -90,19 +115,18 @@ const TableGuest = () => {
                                     <td>{!e.isConfirmed ? (<span className="badge text-bg-warning">No cofirmado</span>) : (<span className="badge text-bg-success">Confirmado</span>)}</td>
                                     <td>
                                         <div className='d-flex gap-1'>
-                                            <span onClick={()=>setGuestSelected(e)} type="button" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            <span onClick={()=> handleClickGuest(e)} type="button" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-custom-class="custom-tooltip"
                                                 data-bs-title="Editar Invitado">
-                                                    <div data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">
+                                                   
                                                         <i class="bi bi-pencil-square"></i>
-                                                    </div>
                                             </span>
-                                            <span onClick={() => sendWhatsapp(e.slug, e.numberPhone)} type="button" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-custom-class="custom-tooltip"
                                                 data-bs-title="Enviar mensaje de whathsapp">
                                                 <i class="bi bi-whatsapp"></i>
                                             </span>
-                                            <span onClick={()=>handleDelete()} type="button" class="btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            <span onClick={()=>handleDelete(e.numberPhone)} type="button" class="btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-custom-class="custom-tooltip"
                                                 data-bs-title="Borrar Invitado">
                                                 <i class="bi bi-trash"></i>
@@ -128,8 +152,7 @@ const TableGuest = () => {
                     </li>
                 </ul>
             </nav>
-
-            <ModalFormEdit {...guestSelected}/>
+            <ModalFormEdit />
         </div>
     )
 }
