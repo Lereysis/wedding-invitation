@@ -3,9 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { updatedState,resetStateLoading } from '@/redux/Slices/guestSlice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
-
-
+import validate from '@/helpers/validate'
 import api from '@/services/api/api'
 
 
@@ -16,7 +14,8 @@ const ModalFormEdit = () => {
     const selectedGuest = useSelector(state => state.guests.selectedGuest)
     
     const [infoGuest,setInfoGuest] = useState({})
-    
+    const [errors, setErrors] = useState({})
+
     useEffect( () => {
         setInfoGuest({...selectedGuest})
     },[selectedGuest])
@@ -26,11 +25,35 @@ const ModalFormEdit = () => {
             ...infoGuest,
             [event.target.name] : event.target.value
         })
-        console.log(infoGuest)
-       
+        setErrors(validate({                 
+            ...infoGuest,                        
+            [event.target.name] : event.target.value
+        }))
     }
 
     const handleClick = async () => {
+        dispatch(resetStateLoading('loadingStateAddGuest'))
+
+        if(errors.name || errors.numberPhone || errors.numberGuest){
+
+            MySwal.fire({
+                icon: 'error',
+                title: 'Ups...',
+                text: 'Tienes un error en los campos!',
+            })
+            return
+        }
+
+        if(!state.name.length || !state.numberPhone.length || !state.numberGuest.length || !state.messageCustomize.length){
+
+            MySwal.fire({
+                icon: 'error',
+                title: 'Ups...',
+                text: 'Todos los campos son obligatorios!',
+            })
+ 
+            return
+        }
         dispatch(resetStateLoading('loadingStateChangeState'))   
         await api.put('/guest',{oldGuest:{...selectedGuest},newGuest:{...infoGuest}})
         dispatch(updatedState('loadingStateChangeState'))
@@ -58,14 +81,17 @@ const ModalFormEdit = () => {
                             <div className="mb-3">
                                 <label htmlFor="name-guest" className="col-form-label">Nombre de el invitado:</label>
                                 <input onChange={handleChange} type="text" className="form-control" id="name-guest" value={infoGuest.name} name="name"/>
+                                {errors.name && (<p className='text-danger'>{errors.name}</p>)}
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="number-guest" className="col-form-label">Numero de invitados:</label>
                                 <input onChange={handleChange} type="text" className="form-control" id="number-guest" value={infoGuest.numberGuest} name="numberGuest" />
+                                {errors.numberGuest && (<p className='text-danger'>{errors.numberGuest}</p>)}
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="number-phone" className="col-form-label">Numero de Telefono:</label>
                                 <input onChange={handleChange} type="text" className="form-control" id="number-phone" value={infoGuest.numberPhone} name="numberPhone" />
+                                {errors.numberPhone && (<p className='text-danger' >{errors.numberPhone}</p>)}
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="message" className="form-label">Mensaje perzonalizado para el invitado</label>

@@ -7,9 +7,12 @@ const initialState = {
   loadingStateAddGuest:false,
   loadingStateDeleteGuest:false,
   loadingStateChangeState:false,
+  loadingStateConfirmed:false,
   selectedGuest:{},
   metaDataGuests:{},
+  infoCountGuests:{},
   loadingMetaData:false,
+  pages:[]
 }
 
 export const guestSlice = createSlice({
@@ -32,46 +35,26 @@ export const guestSlice = createSlice({
     setMetaDataGuests: (state, action) => {
       state.metaDataGuests = {...action.payload}
     },
+    setInfoCountGuests: (state, action) => {
+      state.infoCountGuests = {...action.payload}
+    },
+    setPages: (state,action) => {
+      state.pages = action.payload
+    }
 
   },
 })
 
 
 
-export const { getGuests, updatedState,resetStateLoading, setSelectedGuest, setMetaDataGuests } = guestSlice.actions
+export const { getGuests, updatedState,resetStateLoading, setSelectedGuest, setMetaDataGuests, setPages, setInfoCountGuests } = guestSlice.actions
 
-export const fetchGuests = (email) => {
+export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
     return async (dispatch)  => {
-       const response = await api.get(`/guest/${email}?page=0`)
+      const response = await api.get(`/guest/${email}?page=${page}&search=${search}&isConfirmed=${isConfirmed}`)
         dispatch(getGuests(response.data.body))
         dispatch(setMetaDataGuests(response.data.meta.pagination))
-        dispatch(updatedState('loadingStateListGuests'))
-        dispatch(updatedState('loadingMetaData'))
-    }
-}
-export const fetchGoToPage = (email, page) => {
-    return async (dispatch)  => {
-       const response = await api.get(`/guest/${email}?page=${page}`)
-        dispatch(getGuests(response.data.body))
-        dispatch(setMetaDataGuests(response.data.meta.pagination))
-        dispatch(updatedState('loadingStateListGuests'))
-        dispatch(updatedState('loadingMetaData'))
-    }
-}
-export const fetchSearchGuest = (email, search) => {
-    return async (dispatch)  => {
-       const response = await api.get(`/guest/${email}?page=0&search=${search}`)
-        dispatch(getGuests(response.data.body))
-        dispatch(setMetaDataGuests(response.data.meta.pagination))
-        dispatch(updatedState('loadingStateListGuests'))
-        dispatch(updatedState('loadingMetaData'))
-    }
-}
-export const fetchFilterByConfirmation = (email, isConfirmed) => {
-    return async (dispatch)  => {
-       const response = await api.get(`/guest/${email}?page=0&isConfirmed=${isConfirmed}`)
-        dispatch(getGuests(response.data.body))
-        dispatch(setMetaDataGuests(response.data.meta.pagination))
+        dispatch(setInfoCountGuests(response.data.meta.infoCountGuests))
         dispatch(updatedState('loadingStateListGuests'))
         dispatch(updatedState('loadingMetaData'))
     }

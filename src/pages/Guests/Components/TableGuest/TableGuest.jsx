@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchGuests, setSelectedGuest, updatedState, resetStateLoading, fetchGoToPage, fetchSearchGuest, fetchFilterByConfirmation } from '@/redux/Slices/guestSlice'
+import { fetchGuests, setSelectedGuest, updatedState, resetStateLoading,setPages } from '@/redux/Slices/guestSlice'
 import api from '@/services/api/api'
 import paginate from '@/utils/paginate'
 import useUser from '@/hooks/useUser'
@@ -13,30 +13,24 @@ import './TableGuest.scss'
 
 const TableGuest = () => {
     const MySwal = withReactContent(Swal)
+    const { pages, infoCountGuests } = useSelector( state => state.guests)
     const guests = useSelector(state => state.guests.guests)
     const loadingGuest = useSelector(state => state.guests.loadingStateListGuests)
     const loadingAddGuest = useSelector(state => state.guests.loadingStateAddGuest)
     const loadingStateDeleteGuest = useSelector(state => state.guests.loadingStateDeleteGuest)
     const loadingStateChangeState = useSelector(state => state.guests.loadingStateChangeState)
-    const loadingMetaData = useSelector(state => state.guests.loadingMetaData)
     const metaDataGuests = useSelector(state=> state.guests.metaDataGuests)
-    const [pages,setPages] = useState([])
     const [searchNameGuest, setSearchNameGuest] = useState('')
-    const [filterByConfirmation, setFilterByConfirmation] = useState('')
-    
-    
+    const [filterByConfirmation,setFilterByConfirmation] = useState('')
     const { user } = useUser()
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(fetchGuests(user.email))
+        dispatch(fetchGuests(user.email,0, searchNameGuest, filterByConfirmation))
+        dispatch(setPages([...paginate(metaDataGuests.totalGuests, 0).pages])) 
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    }, [dispatch, user, loadingGuest, loadingAddGuest, loadingStateDeleteGuest, loadingStateChangeState])
-
-    useEffect( () => {
-       setPages([...paginate(metaDataGuests.totalGuests, 0).pages])   
-    },[loadingMetaData, loadingGuest, loadingAddGuest, loadingStateDeleteGuest,searchNameGuest])
+    }, [dispatch, user, loadingGuest, loadingAddGuest, loadingStateDeleteGuest, loadingStateChangeState, metaDataGuests.totalGuests])
 
     const sendWhatsapp = async (url, number, message) => {
         await api.post('/send-message', {
@@ -73,36 +67,30 @@ const TableGuest = () => {
         })
     }
 
-    const handleSearchGuest = () => {
-        dispatch(fetchSearchGuest(user.email, searchNameGuest))
-        setPages([...paginate(guests.length, 0).pages])   
-    }
-
-    const handleChangeName = (event) => {
-        if (!event.target.value.length) {
-            handleSearchGuest()
-            return
-        }
+    const handleSearchGuest = (event) => {
         setSearchNameGuest(event.target.value)
+        dispatch(fetchGuests(user.email,0,event.target.value,filterByConfirmation))
+        dispatch(setPages([...paginate(metaDataGuests.totalGuests, 0).pages]))
     }
+    
 
-    const handleFilterBySearchName = (event) => {
+    const handleFilterByIsConfirmed = (event) => {
         setFilterByConfirmation(event.target.value)
-        console.log(event.target.value)
-        dispatch(fetchFilterByConfirmation(user.email, event.target.value))
+        dispatch(fetchGuests(user.email,0,searchNameGuest,event.target.value))
+        dispatch(setPages([...paginate(metaDataGuests.totalGuests, 0).pages]))
     }
 
     return (
         <div className='shadow h-100'>
              <div className='container my-2'>
                 <div className='d-flex flex-column flex-sm-row gap-3 pt-5 px-1'>
-                    <h6> <b><i className="bi bi-people-fill text-primary"></i> Total de invitados: </b>{guests.length + guests.reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
-                    <h6> <b><i className="bi bi-person-fill-check text-primary"></i> Confirmados:</b> {guests.filter(guest => guest.isConfirmed === true).length + guests.filter(guest => guest.isConfirmed === true).reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
-                    <h6> <b><i className="bi bi-person-fill-exclamation text-primary"></i> No confirmado:</b> {guests.filter(guest => guest.isConfirmed === false).length + guests.filter(guest => guest.isConfirmed === false).reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
+                    <h6> <b><i className="bi bi-people-fill text-primary"></i> Total de invitados: </b>{infoCountGuests?.totalSumGuest?.toLocaleString('en-US')}</h6>
+                    <h6> <b><i className="bi bi-person-fill-check text-primary"></i> Confirmados: </b>{ infoCountGuests?.totalIsConfirmed?.toLocaleString('en-US') }</h6>
+                    <h6> <b><i className="bi bi-person-fill-exclamation text-primary"></i> No confirmado: </b> { infoCountGuests?.totalIsNotConfirmed?.toLocaleString('en-US') }</h6>
                 </div>
                 <div className='row mt-4'>
                     <div className='col-12 col-sm-6'>
-                        <select className=" form-select mb-3" onChange={handleFilterBySearchName} aria-label="Default select example">
+                        <select className=" form-select mb-3" onChange={handleFilterByIsConfirmed} aria-label="Default select example">
                             <option value="">Todos</option>
                             <option value="true">Confirmado</option>
                             <option value="false">No Confirmado</option>
@@ -110,13 +98,13 @@ const TableGuest = () => {
                     </div>
                     <div className='col-12 col-sm-6'>
                         <div className="input-group mb-3 ">
-                            <input onChange={ handleChangeName } type="text" className="form-control" placeholder="Ingresa tu busqueda por nombre" aria-label="Recipient's username" aria-describedby="button-addon2" />
-                            <button onClick={ () => handleSearchGuest()  } className="btn btn-primary" type="button" id="button-addon2"><i className="bi bi-search"></i></button>
+                            <input onChange={ handleSearchGuest } type="text" className="form-control" placeholder="Ingresa tu busqueda por nombre" aria-label="Recipient's username" aria-describedby="button-addon2" />
+                            <button className="btn btn-primary" type="button" id="button-addon2"><i className="bi bi-search"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="table-responsive col-12  px-3 pb-5">
+            <div className="table-responsive col-12 pb-5">
                 {
                     !loadingGuest
                         ? (<NotFound>
@@ -179,22 +167,22 @@ const TableGuest = () => {
 
                 <ModalFormEdit />
             </div>
-                <nav aria-label="Page navigation example">
-                    <ul className="pagination justify-content-end">
-                        <li className={ `page-item ${ metaDataGuests.previous || 'disabled'}` }>
-                            <a className="page-link" onClick={ () => dispatch(fetchGoToPage(user.email, metaDataGuests.previous - 1))}><i className="bi bi-chevron-left"></i></a>
-                        </li>
-                        {
-                            pages.map(page => (
-                               <li className="page-item"><a onClick={ () => dispatch(fetchGoToPage(user.email, page - 1))} className="page-link" >{page}</a></li>
-                            ))
-                        }
-                       
-                        <li className={ `page-item ${ metaDataGuests.next || 'disabled'}` }>
-                            <a className="page-link" onClick={ () => dispatch(fetchGoToPage(user.email, metaDataGuests.next - 1))}><i className="bi bi-chevron-right"></i></a>
-                        </li>
-                    </ul>
-                </nav>
+            <nav aria-label="Page navigation example">
+                <ul className="pagination justify-content-end">
+                    <li className={ `page-item ${ metaDataGuests.previous || 'disabled'}` }>
+                        <a className="page-link" onClick={ () => dispatch(fetchGuests(user.email, metaDataGuests.previous - 1, searchNameGuest, filterByConfirmation))}><i className="bi bi-chevron-left"></i></a>
+                    </li>
+                    {
+                        pages?.map(page => (
+                            <li className={`page-item ${ metaDataGuests.page === page && 'active'}`}><a onClick={ () => dispatch(fetchGuests(user.email, page - 1, searchNameGuest, filterByConfirmation))} className="page-link" >{page}</a></li>
+                        ))
+                    }
+                    
+                    <li className={ `page-item ${ metaDataGuests.next || 'disabled'}` }>
+                        <a className="page-link" onClick={ () => dispatch(fetchGuests(user.email, metaDataGuests.next - 1, searchNameGuest, filterByConfirmation))}><i className="bi bi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     )
 }

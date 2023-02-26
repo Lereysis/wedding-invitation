@@ -5,7 +5,7 @@ import { updatedState,resetStateLoading } from '@/redux/Slices/guestSlice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import useUser from '@/hooks/useUser'
-
+import validate from '@/helpers/validate'
 
 const messageDefault = `¡Querida familia [name]! 🤗 
 Nos complace invitarlos a la celebración de nuestro amor en el día más especial de nuestras vidas. Por favor únanse a nosotros en nuestra boda para compartir la alegría, el amor y la felicidad en este día tan importante.
@@ -37,25 +37,6 @@ const FormGuest = () => {
             ...state,                        
             [e.target.name] : e.target.value
         }));
-    }
-
-    function validate(input){
-        let expresion = /^(?![ .]+$)[a-zA-Z .]*$/gm;
-        let errors = {};   
-        if (!input.name) {                          
-            errors.name = "Falta el nombre";       
-        } else if (expresion.test(input.name) === false) {
-            errors.name = "Nombre invalido";
-        } else if (!input.numberGuest) {
-            errors.numberGuest = "Falta el número de invitados";
-        } else if (input.numberGuest <= 0) {
-            errors.numberGuest = "El número no puede ser negativo";
-        } else if(!input.numberPhone){
-            errors.numberPhone = "Falta el número"
-        } else if(input.numberPhone <= 0){
-            errors.numberPhone = "El número no puede ser negativo"
-        }
-        return errors;
     }
 
     const handleSubmit = async (e) => {
