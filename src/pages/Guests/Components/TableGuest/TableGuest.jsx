@@ -45,7 +45,7 @@ const TableGuest = () => {
             message
         })
     }
-
+    
     const handleClickGuest = (guest) => {
         const myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
         const myModalEl = document.getElementById('exampleModal')
@@ -65,7 +65,6 @@ const TableGuest = () => {
         }).then(async (result) => {
             dispatch(resetStateLoading('loadingStateDeleteGuest'))
             if (result.isConfirmed) {
-                console.log(numberPhone)
                 await api.delete('/guest', { data: { numberPhone } })
                 dispatch(updatedState('loadingStateDeleteGuest'))
             } else if (result.isDenied) {
@@ -73,8 +72,6 @@ const TableGuest = () => {
             }
         })
     }
-
-
 
     const handleSearchGuest = () => {
         dispatch(fetchSearchGuest(user.email, searchNameGuest))
@@ -96,14 +93,14 @@ const TableGuest = () => {
     }
 
     return (
-        <div className='shadow'>
+        <div className='shadow h-100'>
              <div className='container my-2'>
                 <div className='d-flex flex-column flex-sm-row gap-3 pt-5 px-1'>
                     <h6> <b><i className="bi bi-people-fill text-primary"></i> Total de invitados: </b>{guests.length + guests.reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
                     <h6> <b><i className="bi bi-person-fill-check text-primary"></i> Confirmados:</b> {guests.filter(guest => guest.isConfirmed === true).length + guests.filter(guest => guest.isConfirmed === true).reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
                     <h6> <b><i className="bi bi-person-fill-exclamation text-primary"></i> No confirmado:</b> {guests.filter(guest => guest.isConfirmed === false).length + guests.filter(guest => guest.isConfirmed === false).reduce((accumulator, currentValue) => accumulator + Number(currentValue.numberGuest), 0)}</h6>
                 </div>
-                <div className='row'>
+                <div className='row mt-4'>
                     <div className='col-12 col-sm-6'>
                         <select className=" form-select mb-3" onChange={handleFilterBySearchName} aria-label="Default select example">
                             <option value="">Todos</option>
@@ -120,7 +117,6 @@ const TableGuest = () => {
                 </div>
             </div>
             <div className="table-responsive col-12  px-3 pb-5">
-                <h3>Lista de Invitados</h3>
                 {
                     !loadingGuest
                         ? (<NotFound>
@@ -132,18 +128,19 @@ const TableGuest = () => {
                             ? (
                                 <NotFound />
                             )
-                            : <table className="table table-striped table-sm caption-top">
+                            : <table className="table table-striped table-sm caption-top align-middle">
+                                <caption>Lista de Invitados</caption>
                                 <thead className='table-dark'>
                                     <tr className='tableTitles'>
-                                        <th scope="col">Nombre de invitado</th>
+                                        <th scope="col">Nombre</th>
                                         <th style={{ width: '10%' }} scope="col" className='text-center'>Cupos</th>
-                                        <th scope="col">Nro de Whatsapp</th>
+                                        <th scope="col">No Whatsapp</th>
                                         <th scope="col">Slug</th>
-                                        <th scope="col">Confirmación</th>
-                                        <th scope="col">Acciones</th>
+                                        <th scope="col">Estado</th>
+                                        <th className='text-center' scope="col">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className='table-group-divider'>
                                     {guests.map(e => {
                                         return (
                                             <tr key={e.numberPhone} className='table-light'>
@@ -152,8 +149,8 @@ const TableGuest = () => {
                                                 <td>{e.numberPhone}</td>
                                                 <td><a href={e.slug} target="_blank" rel="noopener noreferrer">{e.slug} <i className="bi bi-box-arrow-up-right"></i></a></td>
                                                 <td>{!e.isConfirmed ? (<span className="badge text-bg-warning">No cofirmado</span>) : (<span className="badge text-bg-success">Confirmado</span>)}</td>
-                                                <td>
-                                                    <div className='d-flex gap-1'>
+                                                <td className='text-center'>
+                                                    <div className='d-flex gap-1 text-center justify-content-center'>
                                                         <span onClick={() => handleClickGuest(e)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Editar Invitado">

@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { auth } from '../../services/configAuth/authFirebase'
 import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from 'react-redux'
-import { setUser } from '@/redux/Slices/usersSlice'
 import useUser from '@/hooks/useUser'
+import Footer from '@/components/Footer/Footer'
 
 
 const Welcome = () => {
@@ -38,16 +38,19 @@ const Welcome = () => {
     });
   }, [userLocal, auth])
   return (
-    <div className='container vh-100 d-flex justify-content-center align-items-center'>
-      <div>
-        <h1>Bienvenido a tu sistema de invitacion</h1>
-        <p>Podras crear tu lista de invitados para tu ocasion especial y podras enviarlo a traves de whatsapp</p>
-        <p>Debes tener una cuenta en Google</p>
-        <div className='d-flex flex-column gap-3'>
-          <button onClick={login} className='btn btn-primary text-uppercase'>Iniciar Con Google</button>
+    <>
+      <div className='container vh-100 d-flex justify-content-center align-items-center'>
+        <div>
+          <h1>Bienvenido a tu sistema de invitacion</h1>
+          <p>Podras crear tu lista de invitados para tu ocasion especial y podras enviarlo a traves de whatsapp</p>
+          <p>Debes tener una cuenta en Google</p>
+          <div className='d-flex flex-column gap-3'>
+            <button onClick={login} className='btn btn-primary text-uppercase'>Iniciar Con Google</button>
+          </div>
         </div>
       </div>
-    </div>
+      <Footer/>
+    </>
   )
 }
 

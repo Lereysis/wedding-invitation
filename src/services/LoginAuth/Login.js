@@ -10,7 +10,8 @@ const login = async () => {
         localStorage.setItem('Auth Token',token)
         localStorage.setItem('user', JSON.stringify({
             name: result.user.displayName,
-            email:result.user.email
+            email:result.user.email,
+            imgUrl: result.user.photoURL
         }))
         const user = result.user;
     }).catch((error) => {
