@@ -100,11 +100,11 @@ const FormGuest = () => {
 
     return (
         <div className='offcanvas offcanvas-start' tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-            <div class="offcanvas-header">
+            <div className="offcanvas-header">
                 <h4 className="offcanvas-title" id="offcanvasLabel">Agrega tu invitado</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body">
+            <div className="offcanvas-body">
                 <form onSubmit={handleSubmit} className='row'>
                     <div className="col-lg-12 mb-3">
                         <label htmlFor="emailOrUser" className="form-label">Nombre del invitado</label>

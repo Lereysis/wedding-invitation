@@ -131,7 +131,7 @@ const TableGuest = () => {
                                 <tbody className='table-group-divider'>
                                     {guests.map(e => {
                                         return (
-                                            <tr key={e.numberPhone} className='table-light'>
+                                            <tr key={e.id} className='table-light'>
                                                 <td>{e.name}</td>
                                                 <td style={{ width: '10%' }} className='text-center'>{e.numberGuest}</td>
                                                 <td>{e.numberPhone}</td>
