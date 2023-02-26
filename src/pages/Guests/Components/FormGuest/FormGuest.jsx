@@ -110,7 +110,7 @@ const FormGuest = () => {
     }
 
     return (
-        <div className='offcanvas offcanvas-start p-4' tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div className='offcanvas offcanvas-start p-4' tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             <h4>Agrega tu invitado</h4>
             <form onSubmit={handleSubmit} className='row'>
                 <div className="col-lg-12 mb-3">

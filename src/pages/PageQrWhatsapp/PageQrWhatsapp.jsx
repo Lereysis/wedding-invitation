@@ -36,8 +36,8 @@ const PageQrWhatsapp = () => {
                             : (<div className='border bg-body-tertiary d-flex align-items-center justify-content-center' style={{ minHeight: '300px', margin: "0 auto", width: "100%" }}>
                                 {
                                     loading && (
-                                        <div class="spinner-border" role="status">
-                                            <span class="visually-hidden">Loading...</span>
+                                        <div className="spinner-border" role="status">
+                                            <span className="visually-hidden">Loading...</span>
                                         </div>
                                     )
                                  }
