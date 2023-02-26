@@ -44,7 +44,7 @@ const ModalFormEdit = () => {
             return
         }
 
-        if(!state.name.length || !state.numberPhone.length || !state.numberGuest.length || !state.messageCustomize.length){
+        if(!infoGuest.name.length || !infoGuest.numberPhone.length || !infoGuest.numberGuest.length || !infoGuest.messageCustomize.length){
 
             MySwal.fire({
                 icon: 'error',
