@@ -41,27 +41,114 @@ const Wedding = () => {
     }
     return (
         <div className='container-wedding text-center'>
-            <img className='img-fluid' src={bannerBackground1} />
-            <p className='px-3 py-4'>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Incidunt delectus aliquid amet, vel natus voluptates minima? Velit commodi aut sequi incidunt non fugit quisquam accusamus perferendis? Iusto, blanditiis ullam! Ipsam!
-            </p>
-            <div className='position-relative'>
-                <img className='img-fluid' src={imageCouple} alt="" />
-                <div className='pseudo-text'>
-                    <h1 className='special-letter'> C | L </h1>
-                    <p>nos casamos</p>
+            <section className='container-hero'>
+                <img className='img-fluid' src={bannerBackground1} />
+                <div className='position-relative'>
+                    <img className='img-fluid' src={imageCouple} alt=""/>
                 </div>
-            </div>
-            <h1>
-                {guest.name}
-            </h1>
-            <p>
-                Numero de invitados: {guest.numberGuest}
-            </p>
+            </section>
+            <section className='container-about'>
+                <div>
+                    <p>Con nuestro amor, la bendicion de Dios y el apoyo de nuestros padres</p>
+                    <h4 className='fw-bolder'>Nosotros</h4>
+                </div>
+                <div className='container'>
+                    <h3 className='text-start special-letter mb-0'>Carlos</h3>
+                    <h3 className='text-center special-letter mb-0'>&</h3>
+                    <h3 className='text-end special-letter mb-0'>Lereyis</h3>
+                </div>
+                <p className='mt-5'>Tenemos el honor de invitarte a nuestra boda</p>
+            </section>
+            <section className='container-date'>
+                <div>
+                    <div>
+                        <h5>SEPTIEMBRE</h5>
+                        <div className="d-flex align-items-center justify-content-center gap-4 date mx-3">
+                            <span>
+                                SABADO
+                            </span>
+                            <h2 className='m-0'>
+                                16
+                            </h2>
+                            <span>
+                                2023
+                            </span>
+                        </div>
+                        <span>5:30 PM</span>
+                        <p>CEREMONIA Y RECEPCION</p>
+                        <p>SALON ORQUIDEAS</p>
+                        <p>av. Centro Monteria</p>
+                        <button className='btn btn-primary'> Ver ubicacion </button>
+                    </div>
+                </div>
+            </section>
+            <section className='container-timeline'>
 
-            {
-                guest.isConfirmed ? (<ThankYou name={guest.name}/>) : (<button onClick={() => handleConfirmation(guest.numberPhone)} className='btn btn-primary'>Confirmar asistencia</button>)
-            }
+            </section>
+            <section className='container-reservation'>
+                <div className='bullets'>
+                    <div className='container-dot-number'>
+                        <span className='dot'>
+
+                        </span>
+                        <span className='number'>
+                            1
+                        </span>
+                    </div>
+                    <div className='container-dot-number'>
+                        <span className='dot'>
+
+                        </span>
+                        <span className='number'>
+                            2
+                        </span>
+                    </div>
+                    <div className='container-dot-number'>
+                        <span className='dot'>
+
+                        </span>
+                        <span className='number'>
+                            3
+                        </span>
+                    </div>
+                    <div className='container-dot-number'>
+                        <span className='dot active'>
+
+                        </span>
+                        <span className='number'>
+                            4
+                        </span>
+                    </div>
+                    <div className='container-dot-number'>
+                        <span className='dot'>
+
+                        </span>
+                        <span className='number'>
+                            5
+                        </span>
+                    </div>
+                </div>
+            </section>
+            <section className='container-gifts'>
+                <h3>Sugerencia de regalo</h3>
+                <p>
+                    Agradecemos tu presencia, pero si
+                    deseas tener un detalle con nosotros
+                    te damos esta opcion:
+                </p>
+            </section>
+            <section className='container-confirmation'>
+                <h3>Confirmacion</h3>
+                <p>
+                AGRADECEMOS QUE CONFIRMES TU ASISTENCIA haciendo click en este boton si no puede hacer caso omiso a este boton
+                </p>
+                {
+                    guest.isConfirmed ? (<ThankYou name={guest.name}/>) : (<button onClick={() => handleConfirmation(guest.numberPhone)} className='btn btn-primary'>Confirmar asistencia</button>)
+                }
+            </section>
+            <section className='container-footer'>
+
+            </section>
         </div>
     )
 }
