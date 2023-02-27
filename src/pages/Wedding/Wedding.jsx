@@ -5,6 +5,7 @@ import api from '@/services/api/api'
 import { updatedState } from '@/redux/Slices/guestSlice';
 import bannerBackground1 from '../../assets/img/banner-background1.png'
 import imageCouple from '../../assets/img/image-couple.png'
+import Logo from '@/assets/card-Invitation/SVG/Logo.svg'
 import './Wedding.scss'
 
 const ThankYou = ({name}) => {
@@ -12,11 +13,8 @@ const ThankYou = ({name}) => {
         <p>
             ¡Hola {name}! 🤗
             Muchas gracias por confirmar su asistencia a nuestra boda, ¡significa mucho para nosotros tenerlos presentes en nuestro día especial!
-
             Estamos emocionados de compartir este momento con ustedes y esperamos que disfruten de la celebración tanto como nosotros.
-
             No podemos esperar a verlos pronto y compartir juntos este día inolvidable. ¡Gracias de nuevo por su apoyo y amor!
-
             ¡Nos vemos pronto! 🎉
         </p>
     )
@@ -44,7 +42,11 @@ const Wedding = () => {
             <section className='container-hero'>
                 <img className='img-fluid' src={bannerBackground1} />
                 <div className='position-relative'>
-                    <img className='img-fluid' src={imageCouple} alt=""/>
+                    <img className='img-fluid pt-5' src={imageCouple} alt=""/>
+                    <img className='img-fluid logo' src={Logo} alt="Logo Carlos y Lero" />
+                    <p className='pseudo-text'>
+                        ¡Nos Casamos!
+                    </p>
                 </div>
             </section>
             <section className='container-about'>

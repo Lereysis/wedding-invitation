@@ -1,8 +1,35 @@
-.container-wedding{
+.container-wedding {
     max-width: 600px;
     margin: 0 auto;
     background-color: #fafafa;
     font-family: 'Montserrat', sans-serif;
+}
+
+.color-golden {
+    background: #E6C684;
+    background: repeating-linear-gradient(to top, #E6C684 0%, #C09947 22%, #E9C577 42%, #9E6F06 59%, #E5C98D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.container-hero {
+    & .logo {
+        position: absolute;
+        left: 33%;
+        right: 50%;
+        bottom: 80%;
+        width: 35%;
+    }
+    & .pseudo-text {
+        font-family: 'Parisienne', cursive;
+        @extend .color-golden;
+        position: absolute;
+        top: 22%;
+        right: 0;
+        left: 0;
+        text-align: center;
+        font-size: 2.4rem;
+    }
 }
 
 .special-letter {
@@ -51,10 +78,4 @@
     }
 }
 
-.pseudo-text{
-    position: absolute;
-    top: -10px;
-    right: 0;
-    left: 0;
-    text-align: center;
-}
+
