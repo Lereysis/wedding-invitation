@@ -33,11 +33,51 @@ const TableGuest = () => {
     }, [dispatch, user, loadingGuest, loadingAddGuest, loadingStateDeleteGuest, loadingStateChangeState, metaDataGuests.totalGuests])
 
     const sendWhatsapp = async (url, number, message) => {
-        await api.post('/send-message', {
-            number,
-            url: `${window.location.origin}/${url}`,
-            message
+        MySwal.fire({
+            title: <p>Enviando...</p>,
+            didOpen: () => {
+              MySwal.showLoading()
+            },
         })
+        try {
+            const response = await api.post('/send-message', {
+                number,
+                url: `${window.location.origin}/${url}`,
+                message
+            })
+            MySwal.close()
+            
+            if (!response.data.body) {
+              MySwal.fire({
+                icon: 'error',
+                title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
+                didOpen: () => {
+                    MySwal.hideLoading()
+                },
+              })
+              return
+            }
+
+            MySwal.fire({
+              toast:true,
+              position: 'bottom-end',
+              icon: 'success',
+              title: "Mensaje Enviado",
+              showConfirmButton: false,
+              timer: 3000,
+              didOpen: () => {
+                MySwal.hideLoading()
+              },
+          })
+        } catch (error) {
+            MySwal.fire({
+                icon: 'error',
+                title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
+                didOpen: () => {
+                    MySwal.hideLoading()
+                },
+            })
+        }
     }
     
     const handleClickGuest = (guest) => {
@@ -86,6 +126,7 @@ const TableGuest = () => {
                 <div className='d-flex flex-column flex-sm-row gap-3 pt-5 px-1'>
                     <h6> <b><i className="bi bi-people-fill text-primary"></i> Total de invitados: </b>{infoCountGuests?.totalSumGuest?.toLocaleString('en-US')}</h6>
                     <h6> <b><i className="bi bi-person-fill-check text-primary"></i> Confirmados: </b>{ infoCountGuests?.totalIsConfirmed?.toLocaleString('en-US') }</h6>
+                    <h6> <b><i className="bi bi-person-fill-x text-primary"></i> Rechazados: </b> { infoCountGuests?.totalIsDeclined?.toLocaleString('en-US') }</h6>
                     <h6> <b><i className="bi bi-person-fill-exclamation text-primary"></i> No confirmado: </b> { infoCountGuests?.totalIsNotConfirmed?.toLocaleString('en-US') }</h6>
                 </div>
                 <div className='row mt-4'>
@@ -93,7 +134,8 @@ const TableGuest = () => {
                         <select className=" form-select mb-3" onChange={handleFilterByIsConfirmed} aria-label="Default select example">
                             <option value="">Todos</option>
                             <option value="true">Confirmado</option>
-                            <option value="false">No Confirmado</option>
+                            <option value="false">Rechazado</option>
+                            <option value="null">No Confirmado</option>
                         </select>
                     </div>
                     <div className='col-12 col-sm-6'>
@@ -136,14 +178,18 @@ const TableGuest = () => {
                                                 <td style={{ width: '10%' }} className='text-center'>{e.numberGuest}</td>
                                                 <td>{e.numberPhone}</td>
                                                 <td><a href={e.slug} target="_blank" rel="noopener noreferrer">{e.slug} <i className="bi bi-box-arrow-up-right"></i></a></td>
-                                                <td>{!e.isConfirmed ? (<span className="badge text-bg-warning">No cofirmado</span>) : (<span className="badge text-bg-success">Confirmado</span>)}</td>
+                                                <td>{e.isConfirmed === null ? (<span className="badge text-bg-warning">No cofirmado</span>) : !e.isConfirmed ? (<span className="badge text-white text-bg-danger">Rechazado</span>) : (<span className="badge text-white text-bg-success">Confirmado</span>)}</td>
                                                 <td className='text-center'>
                                                     <div className='d-flex gap-1 text-center justify-content-center'>
                                                         <span onClick={() => handleClickGuest(e)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Editar Invitado">
-
                                                             <i className="bi bi-pencil-square"></i>
+                                                        </span>
+                                                        <span type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            data-bs-custom-class="custom-tooltip"
+                                                            data-bs-title="Enviar mensaje de Recordatorio">
+                                                            <i className="bi bi-megaphone"></i>
                                                         </span>
                                                         <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
