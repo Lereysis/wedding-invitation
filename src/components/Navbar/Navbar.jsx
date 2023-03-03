@@ -29,7 +29,10 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav gap-3 mt-3 mt-lg-0 ms-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <Link to="/administracion-invitados" className='btn btn-outline-secondary'> Lista de invitados </Link>
+                            <Link to="/administracion-invitados" className='btn btn-outline-secondary'> Admin de invitaciones </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/lista-de-invitados" className='btn btn-outline-secondary'> Lista de invitados </Link>
                         </li>
                         <li className="nav-item">
                             <Link to="/whatsapp-web-js" className='btn btn-outline-secondary'> Iniciar Sesion en Whatsapp </Link>

@@ -3,6 +3,8 @@ import api from '@/services/api/api'
 
 const initialState = {
   guests: [],
+  detailsGuest:[],
+  listGuests:[],
   loadingStateListGuests:false,
   loadingStateAddGuest:false,
   loadingStateDeleteGuest:false,
@@ -40,14 +42,29 @@ export const guestSlice = createSlice({
     },
     setPages: (state,action) => {
       state.pages = action.payload
+    },
+    getDetailsGuest: (state,action) => {
+      state.detailsGuest = action.payload
+    },
+    getListGuest: (state,action) => {
+      state.listGuests = action.payload
     }
-
   },
 })
 
 
 
-export const { getGuests, updatedState,resetStateLoading, setSelectedGuest, setMetaDataGuests, setPages, setInfoCountGuests } = guestSlice.actions
+export const { 
+  getGuests, 
+  updatedState,
+  resetStateLoading, 
+  setSelectedGuest, 
+  setMetaDataGuests, 
+  setPages, 
+  setInfoCountGuests,
+  getDetailsGuest,
+  getListGuest 
+} = guestSlice.actions
 
 export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
     return async (dispatch)  => {
@@ -57,6 +74,18 @@ export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => 
         dispatch(setInfoCountGuests(response.data.meta.infoCountGuests))
         dispatch(updatedState('loadingStateListGuests'))
         dispatch(updatedState('loadingMetaData'))
+    }
+}
+export const fetchDetailsGuest = (email, id, name) => {
+    return async (dispatch)  => {
+      const response = await api.get(`/guest/details/${email}?id=${id}&name=${name}`)
+        dispatch(getDetailsGuest(response.data.body))
+    }
+}
+export const fetchListGuest = (email) => {
+    return async (dispatch)  => {
+      const response = await api.get(`/guest/list/${email}`)
+      dispatch(getListGuest(response.data.body.Guests))
     }
 }
 

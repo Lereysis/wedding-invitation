@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { fetchGuests, setSelectedGuest, updatedState, resetStateLoading,setPages } from '@/redux/Slices/guestSlice'
 import api from '@/services/api/api'
 import paginate from '@/utils/paginate'
@@ -9,6 +10,7 @@ import withReactContent from 'sweetalert2-react-content'
 import ModalFormEdit from '@/components/ModalFormEdit/ModalFormEdit'
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import NotFound from '../../../../components/NotFound/NotFound'
+
 import './TableGuest.scss'
 
 const TableGuest = () => {
@@ -164,7 +166,7 @@ const TableGuest = () => {
                                     <tr className='tableTitles'>
                                         <th scope="col">Nombre</th>
                                         <th style={{ width: '10%' }} scope="col" className='text-center'>Cupos</th>
-                                        <th scope="col">No Whatsapp</th>
+                                        <th scope="col">Número</th>
                                         <th scope="col">Slug</th>
                                         <th scope="col">Estado</th>
                                         <th className='text-center' scope="col">Acciones</th>
@@ -181,6 +183,9 @@ const TableGuest = () => {
                                                 <td>{e.isConfirmed === null ? (<span className="badge text-bg-warning">No cofirmado</span>) : !e.isConfirmed ? (<span className="badge text-white text-bg-danger">Rechazado</span>) : (<span className="badge text-white text-bg-success">Confirmado</span>)}</td>
                                                 <td className='text-center'>
                                                     <div className='d-flex gap-1 text-center justify-content-center'>
+                                                        <Link to={`/detalle-invitacion/${e.id}/${e.name}`} className="btn btn-outline-primary">
+                                                            <i className="bi bi-box-arrow-up-right"></i>
+                                                        </Link>
                                                         <span onClick={() => handleClickGuest(e)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Editar Invitado">

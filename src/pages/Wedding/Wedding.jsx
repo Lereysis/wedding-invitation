@@ -47,8 +47,8 @@ const Wedding = () => {
             setGuest(response.data.body)
         })()
     }, [loadingStateConfirmed])
-    const handleConfirmation = async (numberPhone) => {
-        const response = await api.post(`/confirmed`, { numberPhone })
+    const handleConfirmation = async (numberPhone,id,responseGuest) => {
+        const response = await api.post(`/confirmed`, { numberPhone,id,responseGuest})
         dispatch(updatedState('loadingStateConfirmed'))
     }
     return (
@@ -244,7 +244,7 @@ const Wedding = () => {
                 AGRADECEMOS QUE CONFIRMES TU ASISTENCIA DANDO CLICK A ESTE BOTON SINO HACER CASO OMISO
                 </p>
                 {
-                    guest.isConfirmed ? (<ThankYou name={guest.name}/>) : (<button onClick={() => handleConfirmation(guest.numberPhone)} className='btn btn-wedding'>Confirmar asistencia</button>)
+                    guest.isConfirmed ? (<ThankYou name={guest.name}/>) : (<button onClick={() => handleConfirmation(guest.numberPhone,guest.id,true)} className='btn btn-wedding'>Confirmar asistencia</button>)
                 }
                 <h3 className='mt-5 mb-4'>Vestimenta Elegante</h3>
                 <img className='icon img-fluid mb-4' src={IconClothes} alt="" srcset="" />
