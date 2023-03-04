@@ -1,30 +1,88 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import { useSelector,useDispatch } from 'react-redux';
-import { fetchDetailsGuest } from '@/redux/Slices/guestSlice';
+import { fetchDetailsGuest,resetStateLoading, updatedState, cleanStateDetailsGuest } from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import useUser from '@/hooks/useUser'
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
+import validate from '@/helpers/validate'
 
 const DetailsGuest = () => {
 
   const dispatch = useDispatch()
-  const {Guests} = useSelector(state => state.guests.detailsGuest)
+  const guests = useSelector(state => state.guests.detailsGuest)
+  const loadingStateDetailsGuest = useSelector(state => state.guests.loadingStateDetailsGuest)
   const {id,name} = useParams()
   const {user} = useUser()
-
+  const [infoGuest,setInfoGuest] = useState({}) 
+  const [errors, setErrors] = useState({})
+  
   useEffect(() => {
+    console.log(guests[0])
+    setInfoGuest({...guests[0]})
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     dispatch(fetchDetailsGuest(user.email,id,name))
-  }, [])
+    return () => {
+      dispatch(cleanStateDetailsGuest())
+      
+    }
+  }, [loadingStateDetailsGuest])
+  
 
+  const handleChange = (event) => {
+    setInfoGuest({
+        ...infoGuest,
+        [event.target.name] : event.target.value
+    })
+    setErrors(validate({                 
+        ...infoGuest,                        
+        [event.target.name] : event.target.value
+    }))
+}
+
+const handleClick = async () => {
+  dispatch(resetStateLoading('loadingStateAddGuest'))
+
+  if(errors.name || errors.numberPhone || errors.numberGuest){
+
+      MySwal.fire({
+          icon: 'error',
+          title: 'Ups...',
+          text: 'Tienes un error en los campos!',
+      })
+      return
+  }
+
+  if(!infoGuest.name.length || !infoGuest.numberPhone.length || !infoGuest.numberGuest.length || !infoGuest.messageCustomize.length){
+
+      MySwal.fire({
+          icon: 'error',
+          title: 'Ups...',
+          text: 'Todos los campos son obligatorios!',
+      })
+
+      return
+  }
+  dispatch(resetStateLoading('loadingStateChangeState'))   
+  await api.put('/guest',{oldGuest:{...guests[0]},newGuest:{...infoGuest}})
+  dispatch(updatedState('loadingStateChangeState'))
+
+  MySwal.fire({
+      toast:true,
+      position: 'bottom-end',
+      icon: 'success',
+      title: 'Se ha actualizado correctamente',
+      showConfirmButton: false,
+      timer: 1500
+  })
+}
 
 
   return (
     <>
       {
-        Guests?.length && (
+        guests?.length && (
           <div className='container '>
             <div className='row gap-3 justify-content-between'>
               <div className='col-12 col-lg-6 shadow h-100 py-5 px-3'>
@@ -33,10 +91,10 @@ const DetailsGuest = () => {
                     Detalles de la invitacion
                   </h3>
                   <div className='d-flex gap-2'>
-                    <Link to={`/${Guests[0].id}/${Guests[0].name}/formulario-de-recordatorio`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Formulario">
+                    <Link to={`/${guests[0].id}/${guests[0].name}/formulario-de-recordatorio`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Formulario">
                       <i className="bi bi-textarea-resize"></i>
                     </Link>
-                    <Link to={`/${Guests[0].slug}`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Invitacion">
+                    <Link to={`/${guests[0].slug}`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Invitacion">
                       <i className="bi bi-box-arrow-up-right"></i>
                     </Link>
                     <button type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
@@ -51,8 +109,8 @@ const DetailsGuest = () => {
                   </div>
                 </div>
                 <div className='d-flex align-items-center gap-1'>
-                  <h5 className='fw-bold m-0'>{Guests[0].name}</h5>
-                  {Guests[0].isConfirmed === null ? (<small className='text-warning'>(No Confirmado)</small>) : !Guests[0].isConfirmed ? (<small className='text-danger'>(Rechazado)</small>) : (<small className='text-success'>(Confirmado)</small>)}
+                  <h5 className='fw-bold m-0'>{guests[0].name}</h5>
+                  {guests[0].isConfirmed === null ? (<small className='text-warning'>(No Confirmado)</small>) : !guests[0].isConfirmed ? (<small className='text-danger'>(Rechazado)</small>) : (<small className='text-success'>(Confirmado)</small>)}
                 </div>
                 <div className='d-flex gap-1 flex-column my-4'>
                   <p className='m-0'>Mensaje de invitacion: <span className="badge rounded-pill text-bg-success">Enviado  - <small>12:45PM</small></span></p>
@@ -70,7 +128,7 @@ const DetailsGuest = () => {
                     </thead>
                     <tbody>
                       {
-                        Guests[0].Accompanists.map( accompanist => {
+                        guests[0]?.Accompanists?.map( accompanist => {
                             return (
                               <React.Fragment key={accompanist.id}>
                                 <tr>
@@ -90,24 +148,24 @@ const DetailsGuest = () => {
                 <form >
                   <div className="mb-3">
                     <label htmlFor="name-guest" className="col-form-label">Nombre de el invitado:</label>
-                    <input type="text" className="form-control" id="name-guest"  name="name" />
-                    {/* {errors.name && (<p className='text-danger'>{errors.name}</p>)} */}
+                    <input onChange={handleChange} type="text" className="form-control" id="name-guest" value={infoGuest.name} name="name" />
+                    {errors.name && (<p className='text-danger'>{errors.name}</p>)}
                   </div>
                   <div className="mb-3">
                     <label htmlFor="number-guest" className="col-form-label">Numero de invitados:</label>
-                    <input type="text" className="form-control" id="number-guest"  name="numberGuest" />
-                    {/* {errors.numberGuest && (<p className='text-danger'>{errors.numberGuest}</p>)} */}
+                    <input onChange={handleChange} type="text" className="form-control" id="number-guest" value={infoGuest.numberGuest} name="numberGuest" />
+                    {errors.numberGuest && (<p className='text-danger'>{errors.numberGuest}</p>)}
                   </div>
                   <div className="mb-3">
                     <label htmlFor="number-phone" className="col-form-label">Numero de Telefono:</label>
-                    <input type="text" className="form-control" id="number-phone"  name="numberPhone" />
-                    {/* {errors.numberPhone && (<p className='text-danger' >{errors.numberPhone}</p>)} */}
+                    <input onChange={handleChange} type="text" className="form-control" id="number-phone" value={infoGuest.numberPhone} name="numberPhone" />
+                    {errors.numberPhone && (<p className='text-danger' >{errors.numberPhone}</p>)}
                   </div>
                   <div className="mb-3">
                     <label htmlFor="message" className="form-label">Mensaje perzonalizado de invitacion</label>
-                    <textarea className='form-control' id="message" name="messageCustomize" rows="8"></textarea>
+                    <textarea onChange={handleChange} className='form-control' id="message" name="messageCustomize" rows="8"  value={infoGuest.messageCustomize}></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary w-100">Guardar</button>
+                  <button onClick={() => handleClick()} type="submit" className="btn btn-primary w-100">Guardar</button>
                 </form>
               </div>
             </div>
