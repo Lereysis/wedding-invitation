@@ -33,6 +33,9 @@ const DetailsGuest = () => {
                     Detalles de la invitacion
                   </h3>
                   <div className='d-flex gap-2'>
+                    <Link to={`/${Guests[0].id}/${Guests[0].name}/formulario-de-recordatorio`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Formulario">
+                      <i className="bi bi-textarea-resize"></i>
+                    </Link>
                     <Link to={`/${Guests[0].slug}`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Invitacion">
                       <i className="bi bi-box-arrow-up-right"></i>
                     </Link>

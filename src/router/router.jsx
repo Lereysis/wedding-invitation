@@ -23,7 +23,7 @@ const router = createBrowserRouter([
         element: <Wedding />,
       },
       {
-        path: "/:id/:slug/formulario-de-recordatorio",
+        path: "/:id/:name/formulario-de-recordatorio",
         element: <ReminderForm />,
       },
       {

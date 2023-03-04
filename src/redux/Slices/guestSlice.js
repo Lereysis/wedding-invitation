@@ -14,7 +14,9 @@ const initialState = {
   metaDataGuests:{},
   infoCountGuests:{},
   loadingMetaData:false,
-  pages:[]
+  pages:[],
+  infoReminder:{},
+  loadingStateFormReminder:false
 }
 
 export const guestSlice = createSlice({
@@ -48,6 +50,12 @@ export const guestSlice = createSlice({
     },
     getListGuest: (state,action) => {
       state.listGuests = action.payload
+    },
+    getReminder: (state,action) => {
+      state.infoReminder = action.payload
+    },
+    cleanReminderState: (state,action) => {
+      state.infoReminder = {}
     }
   },
 })
@@ -63,7 +71,9 @@ export const {
   setPages, 
   setInfoCountGuests,
   getDetailsGuest,
-  getListGuest 
+  getListGuest,
+  getReminder,
+  cleanReminderState
 } = guestSlice.actions
 
 export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
@@ -74,20 +84,27 @@ export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => 
         dispatch(setInfoCountGuests(response.data.meta.infoCountGuests))
         dispatch(updatedState('loadingStateListGuests'))
         dispatch(updatedState('loadingMetaData'))
+      }
     }
-}
-export const fetchDetailsGuest = (email, id, name) => {
-    return async (dispatch)  => {
-      const response = await api.get(`/guest/details/${email}?id=${id}&name=${name}`)
+    export const fetchDetailsGuest = (email, id, name) => {
+      return async (dispatch)  => {
+        const response = await api.get(`/guest/details/${email}?id=${id}&name=${name}`)
         dispatch(getDetailsGuest(response.data.body))
+      }
     }
-}
-export const fetchListGuest = (email) => {
+    export const fetchListGuest = (email) => {
     return async (dispatch)  => {
       const response = await api.get(`/guest/list/${email}`)
       dispatch(getListGuest(response.data.body.Guests))
     }
-}
-
-export default guestSlice.reducer
+  }
+  export const fetchGetReminder = (id,name) => {
+    return async (dispatch)  => {
+      const response = await api.get(`/guest/form/reminder?id=${id}&name=${name}`)
+      dispatch(getReminder(response.data.body))
+      dispatch(updatedState('loadingStateFormReminder'))
+    }
+  }
+  
+  export default guestSlice.reducer
 

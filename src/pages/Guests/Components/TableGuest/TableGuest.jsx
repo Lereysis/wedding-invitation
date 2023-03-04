@@ -191,16 +191,19 @@ const TableGuest = () => {
                                                             data-bs-title="Editar Invitado">
                                                             <i className="bi bi-pencil-square"></i>
                                                         </span>
-                                                        <span type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        {
+                                                            e.isConfirmed && <span type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Enviar mensaje de Recordatorio">
-                                                            <i className="bi bi-megaphone"></i>
-                                                        </span>
-                                                        <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            <i className="bi bi-megaphone"></i></span>
+                                                        }
+                                                        {
+                                                            !e.isConfirmed &&  <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Enviar mensaje de whathsapp">
                                                             <i className="bi bi-whatsapp"></i>
-                                                        </span>
+                                                            </span>
+                                                        }
                                                         <span onClick={() => handleDelete(e.numberPhone)} type="button" className="btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Borrar Invitado">
