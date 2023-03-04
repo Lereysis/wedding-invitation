@@ -23,11 +23,6 @@ $theme-colors: (
     
 }
 
-html, body, #root {
-  @media (min-width:768px) {
-    height: 100%;
-  }
-}
 
 body {
     font-family: 'Montserrat', sans-serif;

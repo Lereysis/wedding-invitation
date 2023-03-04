@@ -123,7 +123,7 @@ const TableGuest = () => {
     }
 
     return (
-        <div className='shadow h-100'>
+        <div className='shadow'>
              <div className='container my-2'>
                 <div className='d-flex flex-column flex-sm-row gap-3 pt-5 px-1'>
                     <h6> <b><i className="bi bi-people-fill text-primary"></i> Total de invitados: </b>{infoCountGuests?.totalSumGuest?.toLocaleString('en-US')}</h6>

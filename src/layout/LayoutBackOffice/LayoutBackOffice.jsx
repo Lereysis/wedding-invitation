@@ -8,13 +8,13 @@ const LayoutBackOffice = ({ children }) => {
     })
     return (
         <ProtectedRoute>
-            <>
+            <div className='h-100 d-flex flex-column'>
                 <Navbar/>
                 <div className='h-100 my-5'>
                     {children}
                 </div>
                 <Footer/>
-            </>
+            </div>
         </ProtectedRoute>
     )
 }

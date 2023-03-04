@@ -10,6 +10,7 @@ const initialState = {
   loadingStateDeleteGuest:false,
   loadingStateChangeState:false,
   loadingStateConfirmed:false,
+  loadingStateDetailsGuest:false,
   selectedGuest:{},
   metaDataGuests:{},
   infoCountGuests:{},
@@ -48,6 +49,9 @@ export const guestSlice = createSlice({
     },
     getListGuest: (state,action) => {
       state.listGuests = action.payload
+    },
+    cleanStateDetailsGuest: (state, action) => {
+      state.detailsGuest = []
     }
   },
 })
@@ -63,7 +67,8 @@ export const {
   setPages, 
   setInfoCountGuests,
   getDetailsGuest,
-  getListGuest 
+  getListGuest,
+  cleanStateDetailsGuest
 } = guestSlice.actions
 
 export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
@@ -79,7 +84,8 @@ export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => 
 export const fetchDetailsGuest = (email, id, name) => {
     return async (dispatch)  => {
       const response = await api.get(`/guest/details/${email}?id=${id}&name=${name}`)
-        dispatch(getDetailsGuest(response.data.body))
+        dispatch(getDetailsGuest(response.data.body.Guests))
+        dispatch(updatedState('loadingStateDetailsGuest'))
     }
 }
 export const fetchListGuest = (email) => {
