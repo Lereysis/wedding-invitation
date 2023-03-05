@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import api from '@/services/api/api'
+import sendNotification from '@/services/SendNotification/sendNotification';
 import { updatedState } from '@/redux/Slices/guestSlice';
 import bannerBackground1 from '../../assets/img/banner-background1.png'
 import imageCouple from '@/assets/card-Invitation/PNG/firts-img.png'
@@ -47,8 +48,10 @@ const Wedding = () => {
             setGuest(response.data.body)
         })()
     }, [loadingStateConfirmed])
+    console.log(guest)
     const handleConfirmation = async (numberPhone,id,responseGuest) => {
         const response = await api.post(`/confirmed`, { numberPhone,id,responseGuest})
+        await sendNotification(guest.name,responseGuest,guest.UserId)
         dispatch(updatedState('loadingStateConfirmed'))
     }
     return (
