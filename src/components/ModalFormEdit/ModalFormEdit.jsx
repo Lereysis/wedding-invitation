@@ -54,6 +54,23 @@ const ModalFormEdit = () => {
  
             return
         }
+
+        try {
+            await api.post('/guest',{
+                email: user.email,
+                ...state,
+                messageCustomize: state.messageCustomize.replace('[name]', state.name)
+            })
+        } catch (error) {
+            console.log(error)
+            MySwal.fire({
+                icon: 'error',
+                title: 'Ups...',
+                text: 'El numero que intentas ingresar ya existe, si el problema persiste hay errores de servidor, deberas contactarte con soporte.',
+            })
+            return
+        }
+
         dispatch(resetStateLoading('loadingStateChangeState'))   
         await api.put('/guest',{oldGuest:{...selectedGuest},newGuest:{...infoGuest}})
         dispatch(updatedState('loadingStateChangeState'))
@@ -101,7 +118,7 @@ const ModalFormEdit = () => {
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button onClick={() => handleClick()} type="button" className="btn btn-primary" data-bs-dismiss="modal">Guardar cambios</button>
+                        <button onClick={() => handleClick()} type="button" className="btn btn-primary" >Guardar cambios</button>
                     </div>
                 </div>
             </div>

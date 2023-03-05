@@ -20,7 +20,7 @@ const PageQrWhatsapp = () => {
                         <ol>
                             <li> Dale click al boton para generar el QR <small> (este paso puede tomar unos minutos).</small> </li>
                             <li> Escanea el codigo QR con tu aplicacion de whatsapp en tu celular. </li>
-                            <li> Manten tu inicion iniciada. </li>
+                            <li> Manten tu sesión iniciada. </li>
                         </ol>
                     </div>
                     <div className="col-lg-6">
