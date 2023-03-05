@@ -20,12 +20,15 @@ $theme-colors: (
 
 :root {
     font-size: 14px;
-    
 }
-
 
 body {
     font-family: 'Montserrat', sans-serif;
+}
+
+
+.mvh-85 {
+  min-height: 85vh;
 }
 
 .btn-float {
@@ -58,4 +61,23 @@ body {
 .swal2-title {
   font-size: 1rem !important;
   font-weight: 400 !important;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+  gap: .5rem;
+  @media (max-width:576px) {
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  }
+}
+
+.card {
+  min-height: 20rem;
+  height: 20rem;
+  overflow: auto;
+  span {
+    font-size: 12px;
+    line-height: 1;
+  }
 }

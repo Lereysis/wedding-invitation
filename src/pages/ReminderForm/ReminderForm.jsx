@@ -3,13 +3,13 @@ import { useSelector,useDispatch } from 'react-redux';
 import api from '@/services/api/api'
 import { fetchGetReminder } from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const ReminderForm = () => {
-
+  const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
   const infoReminder = useSelector(state => state.guests.infoReminder)
-  const loadingStateFormReminder = useSelector(state => state.guests.loadingStateFormReminder)
   const {id,name} = useParams()
   const [dataForm,setDataForm] = useState([
     {
@@ -41,6 +41,16 @@ const ReminderForm = () => {
   }
 
   const sendInfoAccompanist = async () => {
+    
+    if (dataForm.some( data => !data.name.length || !data.identifier.length || !data.age.length )) {
+          MySwal.fire({
+            icon: 'error',
+            title: 'Ups...',
+            text: 'Todos los campos son obligatorios!',
+        })
+        return
+    }
+
     await api.post('/guest/details',{
       id,
       name,
@@ -61,7 +71,7 @@ const ReminderForm = () => {
           }
         </select>
         {
-          numberSelected.length && dataForm.map( (field,index) => {
+          !numberSelected.length ? ( <h1>Selecciona numero de personas </h1>) : dataForm.map( (field,index) => {
             return (
               <React.Fragment key={index}>
                 <div className="row mb-4">

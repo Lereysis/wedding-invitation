@@ -1,33 +1,32 @@
 import React, { useEffect,useState } from 'react'
 import { useSelector,useDispatch } from 'react-redux';
+import api from '@/services/api/api'
 import { fetchDetailsGuest,resetStateLoading, updatedState, cleanStateDetailsGuest } from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import useUser from '@/hooks/useUser'
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import validate from '@/helpers/validate'
 
 const DetailsGuest = () => {
-
+  const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
-  const guests = useSelector(state => state.guests.detailsGuest)
+  const guest = useSelector(state => state.guests.detailsGuest)
   const loadingStateDetailsGuest = useSelector(state => state.guests.loadingStateDetailsGuest)
+  const loadingStateAddGuest = useSelector(state => state.guests.loadingStateAddGuest)
   const {id,name} = useParams()
   const {user} = useUser()
   const [infoGuest,setInfoGuest] = useState({}) 
   const [errors, setErrors] = useState({})
-  
+  const navigate = useNavigate()
   useEffect(() => {
-    console.log(guests[0])
-    setInfoGuest({...guests[0]})
+    setInfoGuest({...guest})
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     dispatch(fetchDetailsGuest(user.email,id,name))
-    return () => {
-      dispatch(cleanStateDetailsGuest())
-      
-    }
-  }, [loadingStateDetailsGuest])
+  }, [dispatch,id,name,guest.name])
   
 
   const handleChange = (event) => {
@@ -39,50 +38,153 @@ const DetailsGuest = () => {
         ...infoGuest,                        
         [event.target.name] : event.target.value
     }))
-}
-
-const handleClick = async () => {
-  dispatch(resetStateLoading('loadingStateAddGuest'))
-
-  if(errors.name || errors.numberPhone || errors.numberGuest){
-
-      MySwal.fire({
-          icon: 'error',
-          title: 'Ups...',
-          text: 'Tienes un error en los campos!',
-      })
-      return
   }
 
-  if(!infoGuest.name.length || !infoGuest.numberPhone.length || !infoGuest.numberGuest.length || !infoGuest.messageCustomize.length){
+  const handleClick = async () => {
+    dispatch(resetStateLoading('loadingStateAddGuest'))
 
-      MySwal.fire({
-          icon: 'error',
-          title: 'Ups...',
-          text: 'Todos los campos son obligatorios!',
-      })
+    if(errors.name || errors.numberPhone || errors.numberGuest){
 
-      return
+        MySwal.fire({
+            icon: 'error',
+            title: 'Ups...',
+            text: 'Tienes un error en los campos!',
+        })
+        return
+    }
+
+    if(!infoGuest.name.length || !infoGuest.numberPhone.length || !infoGuest.numberGuest.length || !infoGuest.messageCustomize.length){
+        MySwal.fire({
+            icon: 'error',
+            title: 'Ups...',
+            text: 'Todos los campos son obligatorios!',
+        })
+        return
+    }
+
+    dispatch(resetStateLoading('loadingStateChangeState'))   
+    await api.put('/guest',{oldGuest:{
+      name:guest.name,
+      messageCustomize: guest.messageCustomize,
+      numberPhone: guest.numberPhone,
+      numberGuest: guest.numberGuest,
+      id: guest.id
+    },newGuest:{      
+      name:infoGuest.name,
+      messageCustomize: infoGuest.messageCustomize,
+      numberPhone: infoGuest.numberPhone,
+      numberGuest: infoGuest.numberGuest,
+      id: infoGuest.id
+    }})
+    dispatch(updatedState('loadingStateChangeState'))
+
+    MySwal.fire({
+        toast:true,
+        position: 'bottom-end',
+        icon: 'success',
+        title: 'Se ha actualizado correctamente',
+        showConfirmButton: false,
+        timer: 1500
+    })
+    navigate(`/detalle-invitacion/${infoGuest.id}/${infoGuest.name}`)
   }
-  dispatch(resetStateLoading('loadingStateChangeState'))   
-  await api.put('/guest',{oldGuest:{...guests[0]},newGuest:{...infoGuest}})
-  dispatch(updatedState('loadingStateChangeState'))
 
-  MySwal.fire({
-      toast:true,
-      position: 'bottom-end',
-      icon: 'success',
-      title: 'Se ha actualizado correctamente',
-      showConfirmButton: false,
-      timer: 1500
-  })
-}
-
+  const sendWhatsapp = async (url, number, message) => {
+      MySwal.fire({
+          title: <p>Enviando...</p>,
+          didOpen: () => {
+            MySwal.showLoading()
+          },
+      })
+      try {
+          const response = await api.post('/send-message', {
+              number,
+              url: `${window.location.origin}/${url}`,
+              message
+          })
+          MySwal.close()
+          
+          if (!response.data.body) {
+            MySwal.fire({
+              icon: 'error',
+              title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
+              didOpen: () => {
+                  MySwal.hideLoading()
+              },
+            })
+            return
+          }
+          MySwal.fire({
+            toast:true,
+            position: 'bottom-end',
+            icon: 'success',
+            title: "Mensaje Enviado",
+            showConfirmButton: false,
+            timer: 3000,
+            didOpen: () => {
+              MySwal.hideLoading()
+            },
+        })
+      } catch (error) {
+          MySwal.fire({
+              icon: 'error',
+              title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
+              didOpen: () => {
+                  MySwal.hideLoading()
+              },
+          })
+      }
+  }
+  const sendWhatsappReminder = async (id, name, number) => {
+      MySwal.fire({
+          title: <p>Enviando...</p>,
+          didOpen: () => {
+            MySwal.showLoading()
+          },
+      })
+      try {
+          const response = await api.post('/send-message-reminder', {
+              number,
+              url: `${window.location.origin}/${id}/${name}/formulario-de-recordatorio`,
+          })
+          MySwal.close()
+          
+          if (!response.data.body) {
+            MySwal.fire({
+              icon: 'error',
+              title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
+              didOpen: () => {
+                  MySwal.hideLoading()
+              },
+            })
+            return
+          }
+          MySwal.fire({
+            toast:true,
+            position: 'bottom-end',
+            icon: 'success',
+            title: "Mensaje Enviado",
+            showConfirmButton: false,
+            timer: 3000,
+            didOpen: () => {
+              MySwal.hideLoading()
+            },
+        })
+      } catch (error) {
+          MySwal.fire({
+              icon: 'error',
+              title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
+              didOpen: () => {
+                  MySwal.hideLoading()
+              },
+          })
+      }
+  }
 
   return (
     <>
       {
-        guests?.length && (
+        Boolean(guest) && (
           <div className='container '>
             <div className='row gap-3 justify-content-between'>
               <div className='col-12 col-lg-6 shadow h-100 py-5 px-3'>
@@ -91,30 +193,27 @@ const handleClick = async () => {
                     Detalles de la invitacion
                   </h3>
                   <div className='d-flex gap-2'>
-                    <Link to={`/${guests[0].id}/${guests[0].name}/formulario-de-recordatorio`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Formulario">
+                    <Link to={`/${guest.id}/${guest.name}/formulario-de-recordatorio`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Formulario">
                       <i className="bi bi-textarea-resize"></i>
                     </Link>
-                    <Link to={`/${guests[0].slug}`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Invitacion">
+                    <Link to={`/${guest.slug}`} className='btn btn-secondary' data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Ver Invitacion">
                       <i className="bi bi-box-arrow-up-right"></i>
                     </Link>
-                    <button type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
+                    {
+                      guest.isConfirmed && <button onClick={() => sendWhatsappReminder(guest.id, guest.name, guest.numberPhone)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
                       <i className="bi bi-megaphone"></i>
                     </button>
-                    <button type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de whathsapp">
+                    }
+                    {
+                      !guest.isConfirmed && <button onClick={() => sendWhatsapp(guest.slug, guest.numberPhone, guest.messageCustomize)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de whathsapp">
                       <i className="bi bi-whatsapp"></i>
-                    </button>
-                    <span type="button" className="btn btn-danger text-white" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Borrar Invitado">
-                          <i className="bi bi-trash"></i>
-                    </span>
+                      </button>
+                    }
                   </div>
                 </div>
-                <div className='d-flex align-items-center gap-1'>
-                  <h5 className='fw-bold m-0'>{guests[0].name}</h5>
-                  {guests[0].isConfirmed === null ? (<small className='text-warning'>(No Confirmado)</small>) : !guests[0].isConfirmed ? (<small className='text-danger'>(Rechazado)</small>) : (<small className='text-success'>(Confirmado)</small>)}
-                </div>
-                <div className='d-flex gap-1 flex-column my-4'>
-                  <p className='m-0'>Mensaje de invitacion: <span className="badge rounded-pill text-bg-success">Enviado  - <small>12:45PM</small></span></p>
-                  <p className='m-0'>Mensaje de Recordatorio: <span className="badge rounded-pill text-bg-warning">Por Enviar</span></p>
+                <div className='d-flex align-items-center gap-1 mb-4'>
+                  <h5 className='fw-bold m-0'>{guest.name}</h5>
+                  {guest.isConfirmed === null ? (<small className='text-warning'>(No Confirmado)</small>) : !guest.isConfirmed ? (<small className='text-danger'>(Rechazado)</small>) : (<small className='text-success'>(Confirmado)</small>)}
                 </div>
                 <h4 className='mb-4'>Nombre de los acompañantes</h4>
                 <div className='table-responsive'>
@@ -128,7 +227,7 @@ const handleClick = async () => {
                     </thead>
                     <tbody>
                       {
-                        guests[0]?.Accompanists?.map( accompanist => {
+                        guest?.Accompanists?.map( accompanist => {
                             return (
                               <React.Fragment key={accompanist.id}>
                                 <tr>
@@ -165,8 +264,8 @@ const handleClick = async () => {
                     <label htmlFor="message" className="form-label">Mensaje perzonalizado de invitacion</label>
                     <textarea onChange={handleChange} className='form-control' id="message" name="messageCustomize" rows="8"  value={infoGuest.messageCustomize}></textarea>
                   </div>
-                  <button onClick={() => handleClick()} type="submit" className="btn btn-primary w-100">Guardar</button>
                 </form>
+                <button onClick={() => handleClick()} type="submit" className="btn btn-primary w-100">Guardar</button>
               </div>
             </div>
           </div>

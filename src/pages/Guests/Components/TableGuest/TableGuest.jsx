@@ -26,7 +26,6 @@ const TableGuest = () => {
     const [filterByConfirmation,setFilterByConfirmation] = useState('')
     const { user } = useUser()
     const dispatch = useDispatch()
-
     useEffect(() => {
         dispatch(fetchGuests(user.email,0, searchNameGuest, filterByConfirmation))
         dispatch(setPages([...paginate(metaDataGuests.totalGuests, 0).pages])) 
@@ -59,7 +58,6 @@ const TableGuest = () => {
               })
               return
             }
-
             MySwal.fire({
               toast:true,
               position: 'bottom-end',
@@ -82,6 +80,52 @@ const TableGuest = () => {
         }
     }
     
+    const sendWhatsappReminder = async (id, name, number) => {
+        MySwal.fire({
+            title: <p>Enviando...</p>,
+            didOpen: () => {
+              MySwal.showLoading()
+            },
+        })
+        try {
+            const response = await api.post('/send-message-reminder', {
+                number,
+                url: `${window.location.origin}/${id}/${name}/formulario-de-recordatorio`,
+            })
+            MySwal.close()
+            
+            if (!response.data.body) {
+              MySwal.fire({
+                icon: 'error',
+                title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
+                didOpen: () => {
+                    MySwal.hideLoading()
+                },
+              })
+              return
+            }
+            MySwal.fire({
+              toast:true,
+              position: 'bottom-end',
+              icon: 'success',
+              title: "Mensaje Enviado",
+              showConfirmButton: false,
+              timer: 3000,
+              didOpen: () => {
+                MySwal.hideLoading()
+              },
+          })
+        } catch (error) {
+            MySwal.fire({
+                icon: 'error',
+                title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
+                didOpen: () => {
+                    MySwal.hideLoading()
+                },
+            })
+        }
+    }
+
     const handleClickGuest = (guest) => {
         const myModal = new bootstrap.Modal(document.getElementById('exampleModal'))
         const myModalEl = document.getElementById('exampleModal')
@@ -192,7 +236,7 @@ const TableGuest = () => {
                                                             <i className="bi bi-pencil-square"></i>
                                                         </span>
                                                         {
-                                                            e.isConfirmed && <span type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            e.isConfirmed && <span onClick={() => sendWhatsappReminder(e.id, e.name, e.numberPhone)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Enviar mensaje de Recordatorio">
                                                             <i className="bi bi-megaphone"></i></span>

@@ -95,7 +95,7 @@ export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => 
 export const fetchDetailsGuest = (email, id, name) => {
   return async (dispatch) => {
     const response = await api.get(`/guest/details/${email}?id=${id}&name=${name}`)
-    dispatch(getDetailsGuest(response.data.body?.Guests))
+    dispatch(getDetailsGuest(response.data.body?.Guests[0]))
     dispatch(updatedState('loadingStateDetailsGuest'))
   }
 }
