@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from 'react'
 import { useSelector,useDispatch } from 'react-redux';
 import api from '@/services/api/api'
-import { fetchDetailsGuest,resetStateLoading, updatedState, setSelectedAccompanist } from '@/redux/Slices/guestSlice';
+import { fetchDetailsGuest,resetStateLoading, updatedState, setSelectedAccompanist} from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -18,6 +18,7 @@ const DetailsGuest = () => {
   const loadingStateAddGuest = useSelector(state => state.guests.loadingStateAddGuest)
   const loadingStateDeleteGuest = useSelector(state => state.guests.loadingStateDeleteGuest)
   const loadingStateChangeState = useSelector(state => state.guests.loadingStateChangeState)
+  const loadingStateConfirmed = useSelector(state => state.guests.loadingStateConfirmed)
   const {id,name} = useParams()
   const {user} = useUser()
   const [infoGuest,setInfoGuest] = useState({}) 
@@ -28,8 +29,17 @@ const DetailsGuest = () => {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     dispatch(fetchDetailsGuest(user.email,id,name))
-  }, [dispatch,id,name,guest.name,loadingStateAddGuest,loadingStateDeleteGuest,loadingStateChangeState])
+
+    return () => {
+      dispatch(resetStateLoading('loadingStateConfirmed'))
+    }
+
+  }, [dispatch,id,name,guest.name,loadingStateAddGuest,loadingStateDeleteGuest,loadingStateChangeState,loadingStateConfirmed])
   
+  const handleConfirmation = async (numberPhone,id,responseGuest) => {
+    const response = await api.post(`/confirmed`, { numberPhone,id,responseGuest})
+    dispatch(updatedState('loadingStateConfirmed'))
+  }
 
   const handleClickAccompanist = (accompanist) => {
     const myModal = new bootstrap.Modal(document.getElementById('modalEditGuest'))
@@ -230,12 +240,17 @@ const DetailsGuest = () => {
                       <i className="bi bi-box-arrow-up-right"></i>
                     </Link>
                     {
-                      guest.isConfirmed && <button onClick={() => sendWhatsappReminder(guest.id, guest.name, guest.numberPhone)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
+                     ( guest.isConfirmed === false ) && <button onClick={() => handleConfirmation(guest.numberPhone,guest.id,null)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Limpiar estado">
+                        <i className="bi bi-stars"></i>
+                    </button>
+                    }
+                    {
+                     ( guest.isConfirmed && guest.isConfirmed !== null) && <button onClick={() => sendWhatsappReminder(guest.id, guest.name, guest.numberPhone)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
                         <i className="bi bi-megaphone"></i>
                     </button>
                     }
                     {
-                      !guest.isConfirmed && <button onClick={() => sendWhatsapp(guest.slug, guest.numberPhone, guest.messageCustomize)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de whathsapp">
+                      (guest.isConfirmed !== false && guest.isConfirmed === null) && <button onClick={() => sendWhatsapp(guest.slug, guest.numberPhone, guest.messageCustomize)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de whathsapp">
                         <i className="bi bi-whatsapp"></i>
                       </button>
                     }

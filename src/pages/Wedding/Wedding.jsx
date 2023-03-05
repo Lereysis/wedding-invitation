@@ -248,8 +248,8 @@ const Wedding = () => {
                 }
                 <h3 className='mt-5 mb-4'>Vestimenta Elegante</h3>
                 <img className='icon img-fluid mb-4' src={IconClothes} alt="" srcset="" />
-
             </section>
+            <button onClick={() => handleConfirmation(guest.numberPhone,guest.id,false)} className='btn btn-wedding'>rechazar asistencia</button>
             <section className='container-footer mb-5'>
                 <p>FAMILIA</p>
                 <h1>
