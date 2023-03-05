@@ -145,7 +145,7 @@ const DetailsGuest = () => {
       try {
           const response = await api.post('/send-message-reminder', {
               number,
-              url: `${window.location.origin}/${id}/${name}/formulario-de-recordatorio`,
+              url: `${window.location.origin}/${id}/${name.replaceAll(' ','%')}/formulario-de-recordatorio`,
           })
           MySwal.close()
           
