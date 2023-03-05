@@ -90,7 +90,7 @@ const TableGuest = () => {
         try {
             const response = await api.post('/send-message-reminder', {
                 number,
-                url: `\n \n ${window.location.origin}/${id}/${name.replaceAll(' ','%').trim().split("\n").join("")}/formulario-de-recordatorio`,
+                url: `\n \n ${window.location.origin}/${id}/${name.replaceAll(' ','%20').trim().split("\n").join("")}/formulario-de-recordatorio`,
             })
             MySwal.close()
             
