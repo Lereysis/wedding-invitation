@@ -102,21 +102,36 @@ const DetailsGuest = () => {
         return
     }
 
-    dispatch(resetStateLoading('loadingStateChangeState'))   
-    await api.put('/guest',{oldGuest:{
-      name:guest.name,
-      messageCustomize: guest.messageCustomize,
-      numberPhone: guest.numberPhone,
-      numberGuest: guest.numberGuest,
-      id: guest.id
-    },newGuest:{      
-      name:infoGuest.name,
-      messageCustomize: infoGuest.messageCustomize,
-      numberPhone: infoGuest.numberPhone,
-      numberGuest: infoGuest.numberGuest,
-      id: infoGuest.id
-    }})
-    dispatch(updatedState('loadingStateChangeState'))
+
+    try {
+      dispatch(resetStateLoading('loadingStateChangeState'))   
+      await api.put('/guest',{oldGuest:{
+        name:guest.name,
+        messageCustomize: guest.messageCustomize,
+        numberPhone: guest.numberPhone,
+        numberGuest: guest.numberGuest,
+        id: guest.id
+      },newGuest:{      
+        name:infoGuest.name,
+        messageCustomize: infoGuest.messageCustomize,
+        numberPhone: infoGuest.numberPhone,
+        numberGuest: infoGuest.numberGuest,
+        id: infoGuest.id
+        },
+          email:user.email
+        },
+      )
+      dispatch(updatedState('loadingStateChangeState'))
+    } catch (error) {
+        console.log(error)
+        MySwal.fire({
+            icon: 'error',
+            title: 'Ups...',
+            text: 'El numero que intentas ingresar ya existe, si el problema persiste hay errores de servidor, deberas contactarte con soporte.',
+        })
+        return
+    }
+
 
     MySwal.fire({
         toast:true,

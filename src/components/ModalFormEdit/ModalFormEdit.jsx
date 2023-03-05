@@ -5,11 +5,13 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import validate from '@/helpers/validate'
 import api from '@/services/api/api'
+import useUser from '@/hooks/useUser';
 
 
 const ModalFormEdit = () => {
     const MySwal = withReactContent(Swal)
     const dispatch = useDispatch()
+    const {user} = useUser()
 
     const selectedGuest = useSelector(state => state.guests.selectedGuest)
     
@@ -56,11 +58,9 @@ const ModalFormEdit = () => {
         }
 
         try {
-            await api.post('/guest',{
-                email: user.email,
-                ...state,
-                messageCustomize: state.messageCustomize.replace('[name]', state.name)
-            })
+            dispatch(resetStateLoading('loadingStateChangeState'))   
+            await api.put('/guest',{oldGuest:{...selectedGuest},newGuest:{...infoGuest},email:user.email})
+            dispatch(updatedState('loadingStateChangeState'))
         } catch (error) {
             console.log(error)
             MySwal.fire({
@@ -70,10 +70,6 @@ const ModalFormEdit = () => {
             })
             return
         }
-
-        dispatch(resetStateLoading('loadingStateChangeState'))   
-        await api.put('/guest',{oldGuest:{...selectedGuest},newGuest:{...infoGuest}})
-        dispatch(updatedState('loadingStateChangeState'))
 
         MySwal.fire({
             toast:true,

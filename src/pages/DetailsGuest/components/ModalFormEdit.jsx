@@ -32,7 +32,7 @@ const ModalFormEdit = () => {
     }
 
     const handleClick = async () => {
-        dispatch(resetStateLoading('loadingStateAddGuest'))
+        // dispatch(resetStateLoading('loadingStateAddGuest'))
 
         if(errors.name || errors.identifier || errors.age){
 
@@ -55,7 +55,7 @@ const ModalFormEdit = () => {
             return
         }
         dispatch(resetStateLoading('loadingStateChangeState'))   
-        await api.put('/accompanist',{oldAccompanist:{...selectedAccompanist},newAccompanist:{...infoAccompanist}})
+        await api.put('/Accompanist',{oldAccompanist:{...selectedAccompanist},newAccompanist:{...infoAccompanist}})
         dispatch(updatedState('loadingStateChangeState'))
 
         MySwal.fire({
