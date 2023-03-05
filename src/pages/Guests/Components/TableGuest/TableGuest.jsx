@@ -236,13 +236,13 @@ const TableGuest = () => {
                                                             <i className="bi bi-pencil-square"></i>
                                                         </span>
                                                         {
-                                                            e.isConfirmed && <span onClick={() => sendWhatsappReminder(e.id, e.name, e.numberPhone)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            (e.isConfirmed && e.isConfirmed !== null ) && <span onClick={() => sendWhatsappReminder(e.id, e.name, e.numberPhone)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Enviar mensaje de Recordatorio">
                                                             <i className="bi bi-megaphone"></i></span>
                                                         }
                                                         {
-                                                            !e.isConfirmed &&  <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            (e.isConfirmed !== false && e.isConfirmed === null)  &&  <span onClick={() => sendWhatsapp(e.slug, e.numberPhone, e.messageCustomize)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                                                             data-bs-custom-class="custom-tooltip"
                                                             data-bs-title="Enviar mensaje de whathsapp">
                                                             <i className="bi bi-whatsapp"></i>
