@@ -1,6 +1,8 @@
 import React, { useEffect,useState } from 'react'
 import { useSelector,useDispatch } from 'react-redux';
 import api from '@/services/api/api'
+import sendWhatsapp from '@/services/MessagesWhatsapp/sendInvitation'
+import sendWhatsappReminder from '@/services/MessagesWhatsapp/sendReminder'
 import { fetchDetailsGuest,resetStateLoading, updatedState, setSelectedAccompanist} from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
@@ -143,98 +145,6 @@ const DetailsGuest = () => {
         timer: 1500
     })
     navigate(`/detalle-invitacion/${infoGuest.id}/${infoGuest.name}`)
-  }
-
-  const sendWhatsapp = async (url, number, message) => {
-      MySwal.fire({
-          title: <p>Enviando...</p>,
-          didOpen: () => {
-            MySwal.showLoading()
-          },
-      })
-      try {
-          const response = await api.post('/send-message', {
-              number,
-              url: `${window.location.origin}/${url}`,
-              message
-          })
-          MySwal.close()
-          
-          if (!response.data.body) {
-            MySwal.fire({
-              icon: 'error',
-              title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
-              didOpen: () => {
-                  MySwal.hideLoading()
-              },
-            })
-            return
-          }
-          MySwal.fire({
-            toast:true,
-            position: 'bottom-end',
-            icon: 'success',
-            title: "Mensaje Enviado",
-            showConfirmButton: false,
-            timer: 3000,
-            didOpen: () => {
-              MySwal.hideLoading()
-            },
-        })
-      } catch (error) {
-          MySwal.fire({
-              icon: 'error',
-              title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
-              didOpen: () => {
-                  MySwal.hideLoading()
-              },
-          })
-      }
-  }
-  const sendWhatsappReminder = async (id, name, number) => {
-      MySwal.fire({
-          title: <p>Enviando...</p>,
-          didOpen: () => {
-            MySwal.showLoading()
-          },
-      })
-      try {
-          const response = await api.post('/send-message-reminder', {
-              number,
-              url: `${window.location.origin}/${id}/${name.replaceAll(' ','%')}/formulario-de-recordatorio`,
-          })
-          MySwal.close()
-          
-          if (!response.data.body) {
-            MySwal.fire({
-              icon: 'error',
-              title: "No encontramos sesion activa de whatsapp, intenta conectarte nuevamente para enviar mensajes",
-              didOpen: () => {
-                  MySwal.hideLoading()
-              },
-            })
-            return
-          }
-          MySwal.fire({
-            toast:true,
-            position: 'bottom-end',
-            icon: 'success',
-            title: "Mensaje Enviado",
-            showConfirmButton: false,
-            timer: 3000,
-            didOpen: () => {
-              MySwal.hideLoading()
-            },
-        })
-      } catch (error) {
-          MySwal.fire({
-              icon: 'error',
-              title: 'Tenemos errores en nuestros servidores, verifica tu conexion de whatsapp e intenta de nuevo, verifica si el numero a que intentas enviar el mensaje si es numero valido, si el problema persite comunicate con soporte',
-              didOpen: () => {
-                  MySwal.hideLoading()
-              },
-          })
-      }
   }
 
   return (
