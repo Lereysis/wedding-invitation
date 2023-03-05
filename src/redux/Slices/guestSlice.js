@@ -14,6 +14,7 @@ const initialState = {
   selectedGuest: {},
   selectedAccompanist: {},
   metaDataGuests: {},
+  metadaListGuests: {},
   infoCountGuests: {},
   loadingMetaData: false,
   pages: [],
@@ -43,6 +44,9 @@ export const guestSlice = createSlice({
     },
     setMetaDataGuests: (state, action) => {
       state.metaDataGuests = { ...action.payload }
+    },
+    setMetadaListGuests: (state, action) => {
+      state.metadaListGuests = { ...action.payload }
     },
     setInfoCountGuests: (state, action) => {
       state.infoCountGuests = { ...action.payload }
@@ -83,7 +87,8 @@ export const {
   getReminder,
   cleanReminderState,
   cleanStateDetailsGuest,
-  setSelectedAccompanist
+  setSelectedAccompanist,
+  setMetadaListGuests
 } = guestSlice.actions
 
 export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
@@ -104,10 +109,11 @@ export const fetchDetailsGuest = (email, id, name) => {
     dispatch(updatedState('loadingStateDetailsGuest'))
   }
 }
-export const fetchListGuest = (email) => {
+export const fetchListGuest = (email, page = "", search = "") => {
   return async (dispatch) => {
-    const response = await api.get(`/guest/list/${email}`)
+    const response = await api.get(`/guest/list/${email}?page=${page}&search=${search}`)
     dispatch(getListGuest(response.data.body.Guests))
+    dispatch(setMetadaListGuests(response.data.meta.pagination))
   }
 }
 export const fetchGetReminder = (id, name) => {
