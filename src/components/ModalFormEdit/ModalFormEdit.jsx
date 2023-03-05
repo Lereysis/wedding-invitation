@@ -66,7 +66,7 @@ const ModalFormEdit = () => {
             MySwal.fire({
                 icon: 'error',
                 title: 'Ups...',
-                text: 'El numero que intentas ingresar ya existe, si el problema persiste hay errores de servidor, deberas contactarte con soporte.',
+                text: 'El número que intentas ingresar ya existe ❌, si el problema persiste deberas contactarte con soporte 👀.',
             })
             return
         }

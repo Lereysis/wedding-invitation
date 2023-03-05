@@ -78,7 +78,7 @@ const FormGuest = () => {
             MySwal.fire({
                 icon: 'error',
                 title: 'Ups...',
-                text: 'El numero que intentas ingresar ya existe, si el problema persiste hay errores de servidor, deberas contactarte con soporte.',
+                text: 'El número que intentas ingresar ya existe ❌, si el problema persiste deberas contactarte con soporte 👀.',
             })
             return
         }
@@ -125,6 +125,7 @@ const FormGuest = () => {
                     </div>
                     <div className="col-lg-12 mb-3">
                         <label htmlFor="message" className="form-label">Mensaje perzonalizado para el invitado</label>
+                        <small className='d-block'>(Tienes "[name]" para personalizar el mensaje con el nombre del invitado) </small>
                         <textarea onChange={handleChange} className='form-control' id="message" name="messageCustomize" value={state.messageCustomize}  rows="8"></textarea>
                     </div>
                     <button type="submit" className="btn btn-primary">Agregar</button>

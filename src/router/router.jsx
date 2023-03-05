@@ -8,11 +8,14 @@ import DetailsGuest from "../pages/DetailsGuest/DetailsGuest";
 import ReminderForm from "../pages/ReminderForm/ReminderForm";
 import LayoutBackOffice from "../layout/LayoutBackOffice/LayoutBackOffice";
 import ListGuest from "../pages/ListGuest/ListGuest";
+import NoMatch from "../components/NoMatch/NoMatch";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement:<NoMatch />,
     children: [
       {
         path: "/",
@@ -61,5 +64,6 @@ const router = createBrowserRouter([
     ]
   },
 ]);
+
 
 export default router

@@ -45,6 +45,15 @@ const ReminderForm = () => {
 
   const sendInfoAccompanist = async () => {
     
+    if(dataForm.some(data => data.age <= 0) ){
+      MySwal.fire({
+          icon: 'error',
+          title: 'Ups...',
+          text: 'No pueden haber números negativos',
+      })
+      return
+  }
+    
     if (dataForm.some( data => !data.name.length || !data.identifier.length || !data.age.length )) {
           MySwal.fire({
             icon: 'error',
