@@ -1,21 +1,23 @@
 import React, { useEffect,useState } from 'react'
 import { useSelector,useDispatch } from 'react-redux';
 import api from '@/services/api/api'
-import { fetchDetailsGuest,resetStateLoading, updatedState, cleanStateDetailsGuest } from '@/redux/Slices/guestSlice';
+import { fetchDetailsGuest,resetStateLoading, updatedState, setSelectedAccompanist } from '@/redux/Slices/guestSlice';
 import { useParams } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content'
-import useUser from '@/hooks/useUser'
+import useUser from '@/hooks/useUser';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
-import validate from '@/helpers/validate'
+import validate from '@/helpers/validate';
+import ModalFormEdit from './components/ModalFormEdit';
 
 const DetailsGuest = () => {
   const MySwal = withReactContent(Swal)
   const dispatch = useDispatch()
   const guest = useSelector(state => state.guests.detailsGuest)
-  const loadingStateDetailsGuest = useSelector(state => state.guests.loadingStateDetailsGuest)
   const loadingStateAddGuest = useSelector(state => state.guests.loadingStateAddGuest)
+  const loadingStateDeleteGuest = useSelector(state => state.guests.loadingStateDeleteGuest)
+  const loadingStateChangeState = useSelector(state => state.guests.loadingStateChangeState)
   const {id,name} = useParams()
   const {user} = useUser()
   const [infoGuest,setInfoGuest] = useState({}) 
@@ -26,8 +28,36 @@ const DetailsGuest = () => {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     dispatch(fetchDetailsGuest(user.email,id,name))
-  }, [dispatch,id,name,guest.name])
+  }, [dispatch,id,name,guest.name,loadingStateAddGuest,loadingStateDeleteGuest,loadingStateChangeState])
   
+
+  const handleClickAccompanist = (accompanist) => {
+    const myModal = new bootstrap.Modal(document.getElementById('modalEditGuest'))
+      const myModalEl = document.getElementById('modalEditGuest')
+      myModal.show(myModalEl)
+      myModalEl.addEventListener('shown.bs.modal', () => {
+          dispatch(setSelectedAccompanist(accompanist))
+      })
+  }
+
+  const handleDelete = async (accompanist) => {
+    console.log(accompanist)
+      MySwal.fire({
+          title: '¿Seguro de querer borrar el invitado?',
+          showDenyButton: true,
+          showCancelButton: false,
+          confirmButtonText: 'Borrar',
+          denyButtonText: `Cancelar`,
+      }).then(async (result) => {
+          dispatch(resetStateLoading('loadingStateDeleteGuest'))
+          if (result.isConfirmed) {
+              await api.delete('/accompanist',{ data: {...accompanist}})
+              dispatch(updatedState('loadingStateDeleteGuest'))
+          } else if (result.isDenied) {
+
+          }
+      })
+  }
 
   const handleChange = (event) => {
     setInfoGuest({
@@ -201,12 +231,12 @@ const DetailsGuest = () => {
                     </Link>
                     {
                       guest.isConfirmed && <button onClick={() => sendWhatsappReminder(guest.id, guest.name, guest.numberPhone)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de Recordatorio">
-                      <i className="bi bi-megaphone"></i>
+                        <i className="bi bi-megaphone"></i>
                     </button>
                     }
                     {
                       !guest.isConfirmed && <button onClick={() => sendWhatsapp(guest.slug, guest.numberPhone, guest.messageCustomize)} type="button" className="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Enviar mensaje de whathsapp">
-                      <i className="bi bi-whatsapp"></i>
+                        <i className="bi bi-whatsapp"></i>
                       </button>
                     }
                   </div>
@@ -223,6 +253,7 @@ const DetailsGuest = () => {
                         <th scope="col">Nombre</th>
                         <th scope="col">Identificador</th>
                         <th scope="col">Edad</th>
+                        <th scope="col" className='text-center'>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -234,6 +265,16 @@ const DetailsGuest = () => {
                                     <td>{accompanist.name}</td>
                                     <td>{accompanist.identifier}</td>
                                     <td>{accompanist.age}</td>
+                                    <td>
+                                      <div className='d-flex gap-1 text-center justify-content-center'>
+                                        <span  onClick={() => handleClickAccompanist(accompanist)} type="button" className="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Editar Invitado">
+                                          <i className="bi bi-pencil-square"></i>
+                                        </span>
+                                        <span onClick={()=> handleDelete(accompanist)} type="button" className="btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Editar Invitado">
+                                          <i className="bi bi-trash"></i>
+                                        </span>
+                                      </div>
+                                    </td>
                                 </tr>
                               </React.Fragment>
                             )
@@ -268,6 +309,7 @@ const DetailsGuest = () => {
                 <button onClick={() => handleClick()} type="submit" className="btn btn-primary w-100">Guardar</button>
               </div>
             </div>
+            <ModalFormEdit/>
           </div>
         )
       }

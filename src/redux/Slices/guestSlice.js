@@ -12,6 +12,7 @@ const initialState = {
   loadingStateConfirmed: false,
   loadingStateDetailsGuest: false,
   selectedGuest: {},
+  selectedAccompanist: {},
   metaDataGuests: {},
   infoCountGuests: {},
   loadingMetaData: false,
@@ -30,6 +31,9 @@ export const guestSlice = createSlice({
     },
     setSelectedGuest: (state, action) => {
       state.selectedGuest = { ...action.payload }
+    },
+    setSelectedAccompanist: (state, action) => {
+      state.selectedAccompanist = { ...action.payload }
     },
     updatedState: (state, action) => {
       state[action.payload] = true
@@ -78,7 +82,8 @@ export const {
   getListGuest,
   getReminder,
   cleanReminderState,
-  cleanStateDetailsGuest
+  cleanStateDetailsGuest,
+  setSelectedAccompanist
 } = guestSlice.actions
 
 export const fetchGuests = (email, page = "", search = "", isConfirmed = "") => {
