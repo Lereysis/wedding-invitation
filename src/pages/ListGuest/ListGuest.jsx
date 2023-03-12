@@ -25,13 +25,13 @@ const ListGuest = () => {
         setTotalGuests(data.length)
     },[metadaListGuests.totalGuests])
 
-    console.log(listGuests)
 
     const downloadData = () => {
         let data = []
         listGuests.forEach( info => {
             data.push(...info.Accompanists.map( accompanist => {
                 return {
+                    Familia: info.name,
                     Nombre: accompanist.name,
                     Identificador: accompanist.identifier,
                     Edad:accompanist.age
